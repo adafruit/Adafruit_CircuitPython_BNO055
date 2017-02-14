@@ -28,7 +28,7 @@ master_doc = 'README'
 # General information about the project.
 project = u'Adafruit BNO055 Library'
 copyright = u'2017 Radomir Dopieralski'
-author = u'Scott Shawcroft'
+author = u'Radomir Dopieralski'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -118,7 +118,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
     (master_doc, 'AdafruitBNO055Library.tex', u'Adafruit BNO055 Library Documentation',
-     u'Phiilip Moyer', 'manual'),
+     u'Radomir Dopieralski', 'manual'),
 ]
 
 # -- Options for manual page output ---------------------------------------
