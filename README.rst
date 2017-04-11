@@ -30,15 +30,14 @@ Of course, you must import the library to use it:
     import adafruit_bno055
 
 
-This driver takes an instantiated and active I2C object (from the `nativeio` or
+This driver takes an instantiated and active I2C object (from the `busio` or
 the `bitbangio` library) as an argument to its constructor.  The way to create
 an I2C object depends on the board you are using. For boards with labeled SCL
 and SDA pins, you can:
 
 .. code:: python
 
-    from nativeio import I2C
-    #from bitbangio import I2C
+    from busio import I2C
     from board import SDA, SCL
 
     i2c = I2C(SCL, SDA)
