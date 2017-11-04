@@ -120,7 +120,7 @@ class BNO055:
         self.buffer[0] = register
         with self.i2c_device as i2c:
             i2c.write(self.buffer, end=1, stop=False)
-            i2c.read_into(self.buffer, start=1)
+            i2c.readinto(self.buffer, start=1)
         return self.buffer[1]
 
     def switch_mode(self, mode):
