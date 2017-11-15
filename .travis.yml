@@ -44,7 +44,7 @@ deploy:
 before_install:
 - sudo apt-get -yqq update
 - sudo apt-get install -y build-essential git python python-pip
-- git clone https://github.com/adafruit/circuitpython.git
+- git clone https://github.com/adafruit/circuitpython.git -b 2.x
 - make -C circuitpython/mpy-cross
 - export PATH=$PATH:$PWD/circuitpython/mpy-cross/
 - sudo pip install shyaml
