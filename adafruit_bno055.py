@@ -93,8 +93,18 @@ class BNO055:
     temperature = _ReadOnlyUnaryStruct(0x34, 'B')
     """Measures the temperature of the chip in degrees Celsius."""
     accelerometer = _ScaledReadOnlyStruct(0x08, '<hhh', 1/100)
+    """Gives the raw accelerometer readings, in m/s.
+
+       .. warning:: This is deprecated. Use `acceleration` instead. It'll work
+         with other drivers too."""
+    acceleration = _ScaledReadOnlyStruct(0x08, '<hhh', 1/100)
     """Gives the raw accelerometer readings, in m/s."""
     magnetometer = _ScaledReadOnlyStruct(0x0e, '<hhh', 1/16)
+    """Gives the raw magnetometer readings in microteslas.
+
+       .. warning:: This is deprecated. Use `magnetic` instead. It'll work with
+         other drivers too."""
+    magnetic = _ScaledReadOnlyStruct(0x0e, '<hhh', 1/16)
     """Gives the raw magnetometer readings in microteslas."""
     gyroscope = _ScaledReadOnlyStruct(0x14, '<hhh', 1/900)
     """Gives the raw gyroscope reading in degrees per second."""
@@ -117,6 +127,9 @@ class BNO055:
         self._write_register(_POWER_REGISTER, _POWER_NORMAL)
         self._write_register(_PAGE_REGISTER, 0x00)
         self._write_register(_TRIGGER_REGISTER, 0x00)
+        time.sleep(0.01)
+        self.mode = NDOF_MODE
+        time.sleep(0.01)
 
     def _write_register(self, register, value):
         self.buffer[0] = register
