@@ -30,12 +30,14 @@ inertial measurement unit module with sensor fusion.
 
 * Author(s): Radomir Dopieralski
 """
+import time
 
 from micropython import const
 from adafruit_bus_device.i2c_device import I2CDevice
 from adafruit_register.i2c_struct import Struct, UnaryStruct
-import time
 
+__version__ = "0.0.0-auto.0"
+__repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_BNO055.git"
 
 _CHIP_ID = const(0xa0)
 
@@ -64,7 +66,7 @@ _POWER_REGISTER = const(0x3e)
 _ID_REGISTER = const(0x00)
 
 
-class _ScaledReadOnlyStruct(Struct):
+class _ScaledReadOnlyStruct(Struct): # pylint: disable=too-few-public-methods
     def __init__(self, register_address, struct_format, scale):
         super(_ScaledReadOnlyStruct, self).__init__(
             register_address, struct_format)
@@ -78,7 +80,7 @@ class _ScaledReadOnlyStruct(Struct):
         raise NotImplementedError()
 
 
-class _ReadOnlyUnaryStruct(UnaryStruct):
+class _ReadOnlyUnaryStruct(UnaryStruct): # pylint: disable=too-few-public-methods
     def __set__(self, obj, value):
         raise NotImplementedError()
 
@@ -91,8 +93,18 @@ class BNO055:
     temperature = _ReadOnlyUnaryStruct(0x34, 'B')
     """Measures the temperature of the chip in degrees Celsius."""
     accelerometer = _ScaledReadOnlyStruct(0x08, '<hhh', 1/100)
+    """Gives the raw accelerometer readings, in m/s.
+
+       .. warning:: This is deprecated. Use `acceleration` instead. It'll work
+         with other drivers too."""
+    acceleration = _ScaledReadOnlyStruct(0x08, '<hhh', 1/100)
     """Gives the raw accelerometer readings, in m/s."""
     magnetometer = _ScaledReadOnlyStruct(0x0e, '<hhh', 1/16)
+    """Gives the raw magnetometer readings in microteslas.
+
+       .. warning:: This is deprecated. Use `magnetic` instead. It'll work with
+         other drivers too."""
+    magnetic = _ScaledReadOnlyStruct(0x0e, '<hhh', 1/16)
     """Gives the raw magnetometer readings in microteslas."""
     gyroscope = _ScaledReadOnlyStruct(0x14, '<hhh', 1/900)
     """Gives the raw gyroscope reading in degrees per second."""
@@ -108,7 +120,16 @@ class BNO055:
     def __init__(self, i2c, address=0x28):
         self.i2c_device = I2CDevice(i2c, address)
         self.buffer = bytearray(2)
-        self.init()
+        chip_id = self._read_register(_ID_REGISTER)
+        if chip_id != _CHIP_ID:
+            raise RuntimeError("bad chip id (%x != %x)" % (chip_id, _CHIP_ID))
+        self.reset()
+        self._write_register(_POWER_REGISTER, _POWER_NORMAL)
+        self._write_register(_PAGE_REGISTER, 0x00)
+        self._write_register(_TRIGGER_REGISTER, 0x00)
+        time.sleep(0.01)
+        self.mode = NDOF_MODE
+        time.sleep(0.01)
 
     def _write_register(self, register, value):
         self.buffer[0] = register
@@ -123,7 +144,24 @@ class BNO055:
             i2c.readinto(self.buffer, start=1)
         return self.buffer[1]
 
-    def switch_mode(self, mode):
+    def reset(self):
+        """Resets the sensor to default settings."""
+        self.mode = CONFIG_MODE
+        try:
+            self._write_register(_TRIGGER_REGISTER, 0x20)
+        except OSError: # error due to the chip resetting
+            pass
+        while True: # wait for the chip to reset
+            time.sleep(0.01)
+            try:
+                chip_id = self._read_register(_ID_REGISTER)
+            except OSError:
+                chip_id = 0
+            if chip_id == _CHIP_ID:
+                break
+
+    @property
+    def mode(self):
         """
         Switch the mode of operation and return the previous mode.
 
@@ -162,42 +200,27 @@ class BNO055:
 
         The default mode is ``NDOF_MODE``.
         """
-        last_mode = self._read_register(_MODE_REGISTER)
-        self._write_register(_MODE_REGISTER, mode)
-        return last_mode
+        return self._read_register(_MODE_REGISTER)
 
-    def init(self, mode=NDOF_MODE):
-        chip_id = self._read_register(_ID_REGISTER)
-        if chip_id != _CHIP_ID:
-            raise RuntimeError("bad chip id (%x != %x)" % (chip_id, _CHIP_ID))
-        self.reset()
-        self._write_register(_POWER_REGISTER, _POWER_NORMAL)
-        self._write_register(_PAGE_REGISTER, 0x00)
-        self._write_register(_TRIGGER_REGISTER, 0x00)
-        time.sleep(0.01)
-        self.switch_mode(mode)
-        time.sleep(0.01)
+    @mode.setter
+    def mode(self, new_mode):
+        self._write_register(_MODE_REGISTER, new_mode)
 
-    def reset(self):
-        """Resets the sensor to default settings."""
-        self.switch_mode(CONFIG_MODE)
-        try:
-            self._write_register(_TRIGGER_REGISTER, 0x20)
-        except OSError: # error due to the chip resetting
-            pass
-        while True: # wait for the chip to reset
-            time.sleep(0.01)
-            try:
-                chip_id = self._read_register(_ID_REGISTER)
-            except OSError:
-                chip_id = 0
-            if chip_id == _CHIP_ID:
-                break
-
-    def use_external_crystal(self, value):
+    @property
+    def external_crystal(self):
         """Switches the use of external crystal on or off."""
-        last_mode = self.switch_mode(CONFIG_MODE)
+        last_mode = self.mode
+        self.mode = CONFIG_MODE
+        self._write_register(_PAGE_REGISTER, 0x00)
+        value = self._read_register(_TRIGGER_REGISTER)
+        self.mode = last_mode
+        return value == 0x80
+
+    @external_crystal.setter
+    def use_external_crystal(self, value):
+        last_mode = self.mode
+        self.mode = CONFIG_MODE
         self._write_register(_PAGE_REGISTER, 0x00)
         self._write_register(_TRIGGER_REGISTER, 0x80 if value else 0x00)
-        self.switch_mode(last_mode)
+        self.mode = last_mode
         time.sleep(0.01)
