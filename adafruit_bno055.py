@@ -22,8 +22,8 @@
 
 
 """
-``adafruit_bno055``
-===================
+``adafruit_bno055`` - Adafruit 9-DOF Absolute Orientation IMU Fusion Breakout - BNO055
+=======================================================================================
 
 This is a CircuitPython driver for the Bosch BNO055 nine degree of freedom
 inertial measurement unit module with sensor fusion.
@@ -95,14 +95,14 @@ class BNO055:
     accelerometer = _ScaledReadOnlyStruct(0x08, '<hhh', 1/100)
     """Gives the raw accelerometer readings, in m/s.
 
-       .. warning:: This is deprecated. Use `acceleration` instead. It'll work
+       .. warning:: This is deprecated. Use ``acceleration`` instead. It'll work
          with other drivers too."""
     acceleration = _ScaledReadOnlyStruct(0x08, '<hhh', 1/100)
     """Gives the raw accelerometer readings, in m/s."""
     magnetometer = _ScaledReadOnlyStruct(0x0e, '<hhh', 1/16)
     """Gives the raw magnetometer readings in microteslas.
 
-       .. warning:: This is deprecated. Use `magnetic` instead. It'll work with
+       .. warning:: This is deprecated. Use ``magnetic`` instead. It'll work with
          other drivers too."""
     magnetic = _ScaledReadOnlyStruct(0x0e, '<hhh', 1/16)
     """Gives the raw magnetometer readings in microteslas."""
