@@ -9,6 +9,10 @@ Introduction
     :target: https://adafru.it/discord
     :alt: Discord
 
+.. image:: https://travis-ci.org/adafruit/Adafruit_CircuitPython_BNO055.svg?branch=master
+    :target: https://travis-ci.org/adafruit/Adafruit_CircuitPython_BNO055
+    :alt: Build Status
+
 
 Dependencies
 =============
