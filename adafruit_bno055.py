@@ -151,14 +151,8 @@ class BNO055:
             self._write_register(_TRIGGER_REGISTER, 0x20)
         except OSError: # error due to the chip resetting
             pass
-        while True: # wait for the chip to reset
-            time.sleep(0.01)
-            try:
-                chip_id = self._read_register(_ID_REGISTER)
-            except OSError:
-                chip_id = 0
-            if chip_id == _CHIP_ID:
-                break
+        # wait for the chip to reset (650 ms typ.)
+        time.sleep(0.7)
 
     @property
     def mode(self):
