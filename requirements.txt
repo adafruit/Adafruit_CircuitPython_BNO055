@@ -1,2 +1,3 @@
+Adafruit-Blinka
 adafruit-micropython-register
 adafruit-micropython-busdevice
