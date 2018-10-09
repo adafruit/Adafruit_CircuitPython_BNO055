@@ -145,14 +145,6 @@ class BNO055:
             i2c.readinto(self.buffer, start=1)
         return self.buffer[1]
 
-    def _get_calibration_data(self):
-        calibration_data = self._read_register(_CALIBRATION_REGISTER)
-        sys = (calibration_data >> 6) & 0x03
-        gyro = (calibration_data >> 4) & 0x03
-        accel = (calibration_data >> 2) & 0x03
-        mag = calibration_data & 0x03
-        return sys, gyro, accel, mag
-
     def reset(self):
         """Resets the sensor to default settings."""
         self.mode = CONFIG_MODE
@@ -206,12 +198,20 @@ class BNO055:
         return self._read_register(_MODE_REGISTER)
 
     @property
-    def is_fully_calibrated(self):
-        """Returns the status of the sensor calibration."""
-        sys, gyro, accel, mag = self._get_calibration_data()
-        if sys < 3 or gyro < 3 or accel < 3 or mag < 3:
-            return False
-        return True
+    def calibration_status(self):
+        """Tuple containing sys, gyro, accel, and mag calibration data."""
+        calibration_data = self._read_register(_CALIBRATION_REGISTER)
+        sys = (calibration_data >> 6) & 0x03
+        gyro = (calibration_data >> 4) & 0x03
+        accel = (calibration_data >> 2) & 0x03
+        mag = calibration_data & 0x03
+        return sys, gyro, accel, mag
+
+    @property
+    def calibrated(self):
+        """Boolean indicating calibration status."""
+        sys, gyro, accel, mag = self.calibration_status
+        return sys == gyro == accel == mag == 0x03
 
     @mode.setter
     def mode(self, new_mode):
