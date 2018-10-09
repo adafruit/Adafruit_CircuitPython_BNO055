@@ -61,6 +61,7 @@ _POWER_SUSPEND = const(0x02)
 
 _MODE_REGISTER = const(0x3d)
 _PAGE_REGISTER = const(0x07)
+_CALIBRATION_REGISTER = const(0x35)
 _TRIGGER_REGISTER = const(0x3f)
 _POWER_REGISTER = const(0x3e)
 _ID_REGISTER = const(0x00)
@@ -144,6 +145,14 @@ class BNO055:
             i2c.readinto(self.buffer, start=1)
         return self.buffer[1]
 
+    def _get_calibration_data(self):
+        calibration_data = self._read_register(_CALIBRATION_REGISTER)
+        sys = (calibration_data >> 6) & 0x03
+        gyro = (calibration_data >> 4) & 0x03
+        accel = (calibration_data >> 2) & 0x03
+        mag = calibration_data & 0x03
+        return sys, gyro, accel, mag
+
     def reset(self):
         """Resets the sensor to default settings."""
         self.mode = CONFIG_MODE
@@ -195,6 +204,14 @@ class BNO055:
         The default mode is ``NDOF_MODE``.
         """
         return self._read_register(_MODE_REGISTER)
+
+    @property
+    def is_fully_calibrated(self):
+        """Returns the status of the sensor calibration."""
+        sys, gyro, accel, mag = self._get_calibration_data()
+        if sys < 3 or gyro < 3 or accel < 3 or mag < 3:
+            return False
+        return True
 
     @mode.setter
     def mode(self, new_mode):
