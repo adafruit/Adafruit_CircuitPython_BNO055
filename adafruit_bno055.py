@@ -62,6 +62,11 @@ _POWER_SUSPEND = const(0x02)
 _MODE_REGISTER = const(0x3d)
 _PAGE_REGISTER = const(0x07)
 _CALIBRATION_REGISTER = const(0x35)
+_OFFSET_ACCEL_REGISTER = const(0x55)
+_OFFSET_MAGNET_REGISTER = const(0x5b)
+_OFFSET_GYRO_REGISTER = const(0x61)
+_RADIUS_ACCEL_REGISTER = const(0x67)
+_RADIUS_MAGNET_REGISTER = const(0x69)
 _TRIGGER_REGISTER = const(0x3f)
 _POWER_REGISTER = const(0x3e)
 _ID_REGISTER = const(0x00)
@@ -212,6 +217,52 @@ class BNO055:
         """Boolean indicating calibration status."""
         sys, gyro, accel, mag = self.calibration_status
         return sys == gyro == accel == mag == 0x03
+
+    _offsets_accelerometer = Struct(_OFFSET_ACCEL_REGISTER, '<hhh')
+    _offsets_magnetometer = Struct(_OFFSET_MAGNET_REGISTER, '<hhh')
+    _offsets_gyroscope = Struct(_OFFSET_GYRO_REGISTER, '<hhh')
+    _radius_accelerometer = Struct(_RADIUS_ACCEL_REGISTER, '<h')
+    _radius_magnetometer = Struct(_RADIUS_MAGNET_REGISTER, '<h')
+
+    @property
+    def offsets_accelerometer(self):
+        last_mode = self.mode
+        self.mode = CONFIG_MODE
+        vector = self._offsets_accelerometer
+        self.mode = last_mode
+        return vector
+
+    @property
+    def offsets_magnetometer(self):
+        last_mode = self.mode
+        self.mode = CONFIG_MODE
+        vector = self._offsets_magnetometer
+        self.mode = last_mode
+        return vector
+
+    @property
+    def offsets_gyroscope(self):
+        last_mode = self.mode
+        self.mode = CONFIG_MODE
+        vector = self._offsets_gyroscope
+        self.mode = last_mode
+        return vector
+
+    @property
+    def radius_accelerometer(self):
+        last_mode = self.mode
+        self.mode = CONFIG_MODE
+        vector = self._radius_accelerometer
+        self.mode = last_mode
+        return vector[0]
+
+    @property
+    def radius_magnetometer(self):
+        last_mode = self.mode
+        self.mode = CONFIG_MODE
+        vector = self._radius_magnetometer
+        self.mode = last_mode
+        return vector[0]
 
     @mode.setter
     def mode(self, new_mode):
