@@ -226,6 +226,7 @@ class BNO055:
 
     @property
     def offsets_accelerometer(self):
+        """Returns a 3-value Struct with the (x, y, z) accelerometer calibration offsets"""
         last_mode = self.mode
         self.mode = CONFIG_MODE
         vector = self._offsets_accelerometer
@@ -234,6 +235,7 @@ class BNO055:
 
     @property
     def offsets_magnetometer(self):
+        """Returns a 3-value Struct with the (x, y, z) magnetometer calibration offsets"""
         last_mode = self.mode
         self.mode = CONFIG_MODE
         vector = self._offsets_magnetometer
@@ -242,6 +244,7 @@ class BNO055:
 
     @property
     def offsets_gyroscope(self):
+        """Returns a 3-value Struct with the (x, y, z) gyroscope calibration offsets"""
         last_mode = self.mode
         self.mode = CONFIG_MODE
         vector = self._offsets_gyroscope
@@ -250,6 +253,7 @@ class BNO055:
 
     @property
     def radius_accelerometer(self):
+        """Returns the current accelerometer calibration radius"""
         last_mode = self.mode
         self.mode = CONFIG_MODE
         vector = self._radius_accelerometer
@@ -258,6 +262,7 @@ class BNO055:
 
     @property
     def radius_magnetometer(self):
+        """Returns the current magnetometer calibration radius"""
         last_mode = self.mode
         self.mode = CONFIG_MODE
         vector = self._radius_magnetometer
