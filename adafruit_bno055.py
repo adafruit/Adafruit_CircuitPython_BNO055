@@ -91,7 +91,7 @@ class BNO055:
     Driver for the BNO055 9DOF IMU sensor.
     """
 
-    temperature = _ReadOnlyUnaryStruct(0x34, 'B')
+    temperature = _ReadOnlyUnaryStruct(0x34, 'b')
     """Measures the temperature of the chip in degrees Celsius."""
     accelerometer = _ScaledReadOnlyStruct(0x08, '<hhh', 1/100)
     """Gives the raw accelerometer readings, in m/s.
@@ -107,7 +107,7 @@ class BNO055:
          other drivers too."""
     magnetic = _ScaledReadOnlyStruct(0x0e, '<hhh', 1/16)
     """Gives the raw magnetometer readings in microteslas."""
-    gyroscope = _ScaledReadOnlyStruct(0x14, '<hhh', 1/900)
+    gyroscope = _ScaledReadOnlyStruct(0x14, '<hhh', 1/16)
     """Gives the raw gyroscope reading in degrees per second."""
     euler = _ScaledReadOnlyStruct(0x1a, '<hhh', 1/16)
     """Gives the calculated orientation angles, in degrees."""
