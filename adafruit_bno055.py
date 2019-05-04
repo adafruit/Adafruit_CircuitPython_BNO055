@@ -197,6 +197,14 @@ class BNO055:
         """
         return self._read_register(_MODE_REGISTER)
 
+    @mode.setter
+    def mode(self, new_mode):
+        self._write_register(_MODE_REGISTER, _CONFIG_MODE)  # Empirically necessary
+        time.sleep_ms(0.02)  # Datasheet table 3.6
+        if new_mode != _CONFIG_MODE:
+            self._write_register(_MODE_REGISTER, new_mode)
+            time.sleep(0.01)  # Table 3.6
+
     @property
     def calibration_status(self):
         """Tuple containing sys, gyro, accel, and mag calibration data."""
@@ -212,10 +220,6 @@ class BNO055:
         """Boolean indicating calibration status."""
         sys, gyro, accel, mag = self.calibration_status
         return sys == gyro == accel == mag == 0x03
-
-    @mode.setter
-    def mode(self, new_mode):
-        self._write_register(_MODE_REGISTER, new_mode)
 
     @property
     def external_crystal(self):
