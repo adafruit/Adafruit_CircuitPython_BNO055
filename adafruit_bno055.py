@@ -199,7 +199,7 @@ class BNO055:
 
     @mode.setter
     def mode(self, new_mode):
-        self._write_register(_MODE_REGISTER, _CONFIG_MODE)  # Empirically necessary
+        self._write_register(_MODE_REGISTER, CONFIG_MODE)  # Empirically necessary
         time.sleep(0.02)  # Datasheet table 3.6
         if new_mode != CONFIG_MODE:
             self._write_register(_MODE_REGISTER, new_mode)
