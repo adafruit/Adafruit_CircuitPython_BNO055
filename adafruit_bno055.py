@@ -90,6 +90,24 @@ class _ReadOnlyUnaryStruct(UnaryStruct): # pylint: disable=too-few-public-method
     def __set__(self, obj, value):
         raise NotImplementedError()
 
+class _ModeStruct(Struct): # pylint: disable=too-few-public-methods
+    def __init__(self, register_address, struct_format, mode):
+        super().__init__(register_address, struct_format)
+        self.mode = mode
+
+    def __get__(self, obj, objtype=None):
+        last_mode = obj.mode
+        obj.mode = self.mode
+        result = super().__get__(obj, objtype)
+        obj.mode = last_mode
+        return result
+
+    def __set__(self, obj, value):
+        last_mode = obj.mode
+        obj.mode = self.mode
+        super().__set__(obj, value)
+        obj.mode = last_mode
+        time.sleep(0.01)
 
 class BNO055:
     """
@@ -122,6 +140,18 @@ class BNO055:
     """Returns the linear acceleration, without gravity, in m/s."""
     gravity = _ScaledReadOnlyStruct(0x2e, '<hhh', 1/100)
     """Returns the gravity vector, without acceleration in m/s."""
+
+    offsets_accelerometer = _ModeStruct(_OFFSET_ACCEL_REGISTER, '<hhh', CONFIG_MODE)
+    """Calibration offsets for the accelerometer"""
+    offsets_magnetometer = _ModeStruct(_OFFSET_MAGNET_REGISTER, '<hhh', CONFIG_MODE)
+    """Calibration offsets for the magnetometer"""
+    offsets_gyroscope = _ModeStruct(_OFFSET_GYRO_REGISTER, '<hhh', CONFIG_MODE)
+    """Calibration offsets for the gyroscope"""
+
+    radius_accelerometer = _ModeStruct(_RADIUS_ACCEL_REGISTER, '<h', CONFIG_MODE)
+    """Radius for accelerometer (cm?)"""
+    radius_magnetometer = _ModeStruct(_RADIUS_MAGNET_REGISTER, '<h', CONFIG_MODE)
+    """Radius for magnetometer (cm?)"""
 
     def __init__(self, i2c, address=0x28):
         self.i2c_device = I2CDevice(i2c, address)
@@ -217,57 +247,6 @@ class BNO055:
         """Boolean indicating calibration status."""
         sys, gyro, accel, mag = self.calibration_status
         return sys == gyro == accel == mag == 0x03
-
-    _offsets_accelerometer = Struct(_OFFSET_ACCEL_REGISTER, '<hhh')
-    _offsets_magnetometer = Struct(_OFFSET_MAGNET_REGISTER, '<hhh')
-    _offsets_gyroscope = Struct(_OFFSET_GYRO_REGISTER, '<hhh')
-    _radius_accelerometer = Struct(_RADIUS_ACCEL_REGISTER, '<h')
-    _radius_magnetometer = Struct(_RADIUS_MAGNET_REGISTER, '<h')
-
-    @property
-    def offsets_accelerometer(self):
-        """Returns a 3-value Struct with the (x, y, z) accelerometer calibration offsets"""
-        last_mode = self.mode
-        self.mode = CONFIG_MODE
-        vector = self._offsets_accelerometer
-        self.mode = last_mode
-        return vector
-
-    @property
-    def offsets_magnetometer(self):
-        """Returns a 3-value Struct with the (x, y, z) magnetometer calibration offsets"""
-        last_mode = self.mode
-        self.mode = CONFIG_MODE
-        vector = self._offsets_magnetometer
-        self.mode = last_mode
-        return vector
-
-    @property
-    def offsets_gyroscope(self):
-        """Returns a 3-value Struct with the (x, y, z) gyroscope calibration offsets"""
-        last_mode = self.mode
-        self.mode = CONFIG_MODE
-        vector = self._offsets_gyroscope
-        self.mode = last_mode
-        return vector
-
-    @property
-    def radius_accelerometer(self):
-        """Returns the current accelerometer calibration radius"""
-        last_mode = self.mode
-        self.mode = CONFIG_MODE
-        vector = self._radius_accelerometer
-        self.mode = last_mode
-        return vector[0]
-
-    @property
-    def radius_magnetometer(self):
-        """Returns the current magnetometer calibration radius"""
-        last_mode = self.mode
-        self.mode = CONFIG_MODE
-        vector = self._radius_magnetometer
-        self.mode = last_mode
-        return vector[0]
 
     @mode.setter
     def mode(self, new_mode):
