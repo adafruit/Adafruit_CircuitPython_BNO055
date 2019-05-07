@@ -107,7 +107,6 @@ class _ModeStruct(Struct): # pylint: disable=too-few-public-methods
         obj.mode = self.mode
         super().__set__(obj, value)
         obj.mode = last_mode
-        time.sleep(0.01)
 
 class BNO055:
     """
