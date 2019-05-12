@@ -100,12 +100,15 @@ class _ModeStruct(Struct): # pylint: disable=too-few-public-methods
         obj.mode = self.mode
         result = super().__get__(obj, objtype)
         obj.mode = last_mode
-        return result
+        # single value comes back as a one-element tuple
+        return result[0] if type(result) == tuple and len(result) == 1 else result
 
     def __set__(self, obj, value):
         last_mode = obj.mode
         obj.mode = self.mode
-        super().__set__(obj, value)
+        # underlying __set__() expects a tuple
+        set_val = (value,) if type(value) != tuple else value
+        super().__set__(obj, set_val)
         obj.mode = last_mode
 
 class BNO055:
