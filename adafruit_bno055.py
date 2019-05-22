@@ -124,7 +124,7 @@ class BNO055:
         chip_id = self._read_register(_ID_REGISTER)
         if chip_id != _CHIP_ID:
             raise RuntimeError("bad chip id (%x != %x)" % (chip_id, _CHIP_ID))
-        self.reset()
+        self._reset()
         self._write_register(_POWER_REGISTER, _POWER_NORMAL)
         self._write_register(_PAGE_REGISTER, 0x00)
         self._write_register(_TRIGGER_REGISTER, 0x00)
@@ -145,7 +145,7 @@ class BNO055:
             i2c.readinto(self.buffer, start=1)
         return self.buffer[1]
 
-    def reset(self):
+    def _reset(self):
         """Resets the sensor to default settings."""
         self.mode = CONFIG_MODE
         try:
