@@ -108,7 +108,12 @@ class BNO055:
     magnetic = _ScaledReadOnlyStruct(0x0e, '<hhh', 1/16)
     """Gives the raw magnetometer readings in microteslas."""
     gyroscope = _ScaledReadOnlyStruct(0x14, '<hhh', 1/16)
-    """Gives the raw gyroscope reading in degrees per second."""
+    """Gives the raw gyroscope reading in degrees per second.
+
+       .. warning:: This is deprecated. Use ``gyro`` instead. It'll work with
+         other drivers too."""
+    gyro = _ScaledReadOnlyStruct(0x14, '<hhh', 0.001090830782496456)
+    """Gives the raw gyroscope reading in radians per second."""
     euler = _ScaledReadOnlyStruct(0x1a, '<hhh', 1/16)
     """Gives the calculated orientation angles, in degrees."""
     quaternion = _ScaledReadOnlyStruct(0x20, '<hhhh', 1/(1<<14))
