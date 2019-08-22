@@ -141,8 +141,8 @@ class BNO055:
     def _read_register(self, register):
         self.buffer[0] = register
         with self.i2c_device as i2c:
-            i2c.write(self.buffer, end=1, stop=False)
-            i2c.readinto(self.buffer, start=1)
+            i2c.write_then_readinto(self.buffer, self.buffer,
+                                    out_end=1, in_start=1)
         return self.buffer[1]
 
     def _reset(self):
