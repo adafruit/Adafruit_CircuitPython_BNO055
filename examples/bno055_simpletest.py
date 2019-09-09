@@ -10,7 +10,7 @@ while True:
     print('Temperature: {} degrees C'.format(sensor.temperature))
     print('Accelerometer (m/s^2): {}'.format(sensor.accelerometer))
     print('Magnetometer (microteslas): {}'.format(sensor.magnetometer))
-    print('Gyroscope (deg/sec): {}'.format(sensor.gyroscope))
+    print('Gyroscope (rad/sec): {}'.format(sensor.gyro))
     print('Euler angle: {}'.format(sensor.euler))
     print('Quaternion: {}'.format(sensor.quaternion))
     print('Linear acceleration (m/s^2): {}'.format(sensor.linear_acceleration))
