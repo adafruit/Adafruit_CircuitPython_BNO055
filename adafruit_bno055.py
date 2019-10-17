@@ -229,21 +229,12 @@ class BNO055:
         """Measures the temperature of the chip in degrees Celsius."""
         return self._temperature
 
-    @temperature.setter
-    def temperature(self):
-        self._temperature = _ReadOnlyUnaryStruct(0x34, 'b')
-
     @property
     def acceleration(self):
         """Gives the raw accelerometer readings, in m/s."""
         if self.mode not in [0, 2, 3, 6]:
             return self._acceleration
         return (None, None, None)
-
-    @acceleration.setter
-    def acceleration(self):
-        self._acceleration = _ScaledReadOnlyStruct(0x08, '<hhh', 1/100)
-
 
     @property
     def magnetic(self):
@@ -252,22 +243,12 @@ class BNO055:
             return self._magnetic
         return (None, None, None)
 
-    @magnetic.setter
-    def magnetic(self):
-        self._magnetic = _ScaledReadOnlyStruct(0x0e, '<hhh', 1/16)
-
-
     @property
     def gyro(self):
         """Gives the raw gyroscope reading in radians per second."""
         if self.mode not in [0, 1, 2, 4, 9, 10]:
             return self._gyro
         return (None, None, None)
-
-    @gyro.setter
-    def gyro(self):
-        self._gyro = _ScaledReadOnlyStruct(0x14, '<hhh', 0.001090830782496456)
-
 
     @property
     def euler(self):
@@ -276,22 +257,12 @@ class BNO055:
             return self._euler
         return (None, None, None)
 
-    @euler.setter
-    def euler(self):
-        self._euler = _ScaledReadOnlyStruct(0x1a, '<hhh', 1/16)
-
-
     @property
     def quaternion(self):
         """Gives the calculated orientation as a quaternion."""
         if self.mode in [9, 11, 12]:
             return self._quaternion
         return (None, None, None, None)
-
-    @quaternion.setter
-    def quaternion(self):
-        self._quaternion = _ScaledReadOnlyStruct(0x20, '<hhhh', 1/(1<<14))
-
 
     @property
     def linear_acceleration(self):
@@ -300,18 +271,9 @@ class BNO055:
             return self._linear_acceleration
         return (None, None, None)
 
-    @linear_acceleration.setter
-    def linear_acceleration(self):
-        self._linear_acceleration = _ScaledReadOnlyStruct(0x28, '<hhh', 1/100)
-
-
     @property
     def gravity(self):
         """Returns the gravity vector, without acceleration in m/s."""
         if self.mode in [9, 11, 12]:
             return self._gravity
         return (None, None, None)
-
-    @gravity.setter
-    def gravity(self):
-        self._gravity = _ScaledReadOnlyStruct(0x2e, '<hhh', 1/100)
