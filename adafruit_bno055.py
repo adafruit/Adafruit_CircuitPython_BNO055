@@ -231,49 +231,63 @@ class BNO055:
 
     @property
     def acceleration(self):
-        """Gives the raw accelerometer readings, in m/s."""
-        if self.mode not in [0, 2, 3, 6]:
+        """Gives the raw accelerometer readings, in m/s.
+        Returns an empty tuple of length 3 when this property has been disabled by the current mode.
+        """
+        if self.mode not in [0x00, 0x02, 0x03, 0x06]:
             return self._acceleration
         return (None, None, None)
 
     @property
     def magnetic(self):
-        """Gives the raw magnetometer readings in microteslas."""
-        if self.mode not in [0, 3, 5, 8]:
+        """Gives the raw magnetometer readings in microteslas.
+        Returns an empty tuple of length 3 when this property has been disabled by the current mode.
+        """
+        if self.mode not in [0x00, 0x03, 0x05, 0x08]:
             return self._magnetic
         return (None, None, None)
 
     @property
     def gyro(self):
-        """Gives the raw gyroscope reading in radians per second."""
-        if self.mode not in [0, 1, 2, 4, 9, 10]:
+        """Gives the raw gyroscope reading in radians per second.
+        Returns an empty tuple of length 3 when this property has been disabled by the current mode.
+        """
+        if self.mode not in [0x00, 0x01, 0x02, 0x04, 0x09, 0x0a]:
             return self._gyro
         return (None, None, None)
 
     @property
     def euler(self):
-        """Gives the calculated orientation angles, in degrees."""
-        if self.mode in [9, 11, 12]:
+        """Gives the calculated orientation angles, in degrees.
+        Returns an empty tuple of length 3 when this property has been disabled by the current mode.
+        """
+        if self.mode in [0x09, 0x0b, 0x0c]:
             return self._euler
         return (None, None, None)
 
     @property
     def quaternion(self):
-        """Gives the calculated orientation as a quaternion."""
-        if self.mode in [9, 11, 12]:
+        """Gives the calculated orientation as a quaternion.
+        Returns an empty tuple of length 3 when this property has been disabled by the current mode.
+        """
+        if self.mode in [0x09, 0x0b, 0x0c]:
             return self._quaternion
         return (None, None, None, None)
 
     @property
     def linear_acceleration(self):
-        """Returns the linear acceleration, without gravity, in m/s."""
-        if self.mode in [9, 11, 12]:
+        """Returns the linear acceleration, without gravity, in m/s.
+        Returns an empty tuple of length 3 when this property has been disabled by the current mode.
+        """
+        if self.mode in [0x09, 0x0b, 0x0c]:
             return self._linear_acceleration
         return (None, None, None)
 
     @property
     def gravity(self):
-        """Returns the gravity vector, without acceleration in m/s."""
-        if self.mode in [9, 11, 12]:
+        """Returns the gravity vector, without acceleration in m/s.
+        Returns an empty tuple of length 3 when this property has been disabled by the current mode.
+        """
+        if self.mode in [0x09, 0x0b, 0x0c]:
             return self._gravity
         return (None, None, None)
