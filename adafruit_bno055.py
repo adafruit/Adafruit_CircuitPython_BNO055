@@ -144,8 +144,10 @@ class BNO055:
         Switch the mode of operation and return the previous mode.
 
         Mode of operation defines which sensors are enabled and whether the
-        measurements are absolute or relative:
-
+        measurements are absolute or relative.
+        If a sensor is disabled, it will return an empty tuple.
+        
+        legend: x=on, -=off
         +------------------+-------+---------+------+----------+
         | Mode             | Accel | Compass | Gyro | Absolute |
         +==================+=======+=========+======+==========+
