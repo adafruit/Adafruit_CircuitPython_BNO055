@@ -91,37 +91,15 @@ class BNO055:
     Driver for the BNO055 9DOF IMU sensor.
     """
 
-    temperature = _ReadOnlyUnaryStruct(0x34, 'b')
-    """Measures the temperature of the chip in degrees Celsius."""
-    accelerometer = _ScaledReadOnlyStruct(0x08, '<hhh', 1/100)
-    """Gives the raw accelerometer readings, in m/s.
+    _temperature = _ReadOnlyUnaryStruct(0x34, 'b')
+    _acceleration = _ScaledReadOnlyStruct(0x08, '<hhh', 1/100)
+    _magnetic = _ScaledReadOnlyStruct(0x0e, '<hhh', 1/16)
+    _gyro = _ScaledReadOnlyStruct(0x14, '<hhh', 0.001090830782496456)
+    _euler = _ScaledReadOnlyStruct(0x1a, '<hhh', 1/16)
+    _quaternion = _ScaledReadOnlyStruct(0x20, '<hhhh', 1/(1<<14))
+    _linear_acceleration = _ScaledReadOnlyStruct(0x28, '<hhh', 1/100)
+    _gravity = _ScaledReadOnlyStruct(0x2e, '<hhh', 1/100)
 
-       .. warning:: This is deprecated. Use ``acceleration`` instead. It'll work
-         with other drivers too."""
-    acceleration = _ScaledReadOnlyStruct(0x08, '<hhh', 1/100)
-    """Gives the raw accelerometer readings, in m/s."""
-    magnetometer = _ScaledReadOnlyStruct(0x0e, '<hhh', 1/16)
-    """Gives the raw magnetometer readings in microteslas.
-
-       .. warning:: This is deprecated. Use ``magnetic`` instead. It'll work with
-         other drivers too."""
-    magnetic = _ScaledReadOnlyStruct(0x0e, '<hhh', 1/16)
-    """Gives the raw magnetometer readings in microteslas."""
-    gyroscope = _ScaledReadOnlyStruct(0x14, '<hhh', 1/16)
-    """Gives the raw gyroscope reading in degrees per second.
-
-       .. warning:: This is deprecated. Use ``gyro`` instead. It'll work with
-         other drivers too."""
-    gyro = _ScaledReadOnlyStruct(0x14, '<hhh', 0.001090830782496456)
-    """Gives the raw gyroscope reading in radians per second."""
-    euler = _ScaledReadOnlyStruct(0x1a, '<hhh', 1/16)
-    """Gives the calculated orientation angles, in degrees."""
-    quaternion = _ScaledReadOnlyStruct(0x20, '<hhhh', 1/(1<<14))
-    """Gives the calculated orientation as a quaternion."""
-    linear_acceleration = _ScaledReadOnlyStruct(0x28, '<hhh', 1/100)
-    """Returns the linear acceleration, without gravity, in m/s."""
-    gravity = _ScaledReadOnlyStruct(0x2e, '<hhh', 1/100)
-    """Returns the gravity vector, without acceleration in m/s."""
 
     def __init__(self, i2c, address=0x28):
         self.i2c_device = I2CDevice(i2c, address)
@@ -166,8 +144,10 @@ class BNO055:
         Switch the mode of operation and return the previous mode.
 
         Mode of operation defines which sensors are enabled and whether the
-        measurements are absolute or relative:
+        measurements are absolute or relative.
+        If a sensor is disabled, it will return an empty tuple.
 
+        legend: x=on, -=off
         +------------------+-------+---------+------+----------+
         | Mode             | Accel | Compass | Gyro | Absolute |
         +==================+=======+=========+======+==========+
@@ -244,3 +224,72 @@ class BNO055:
         self._write_register(_TRIGGER_REGISTER, 0x80 if value else 0x00)
         self.mode = last_mode
         time.sleep(0.01)
+
+
+    @property
+    def temperature(self):
+        """Measures the temperature of the chip in degrees Celsius."""
+        return self._temperature
+
+    @property
+    def acceleration(self):
+        """Gives the raw accelerometer readings, in m/s.
+        Returns an empty tuple of length 3 when this property has been disabled by the current mode.
+        """
+        if self.mode not in [0x00, 0x02, 0x03, 0x06]:
+            return self._acceleration
+        return (None, None, None)
+
+    @property
+    def magnetic(self):
+        """Gives the raw magnetometer readings in microteslas.
+        Returns an empty tuple of length 3 when this property has been disabled by the current mode.
+        """
+        if self.mode not in [0x00, 0x03, 0x05, 0x08]:
+            return self._magnetic
+        return (None, None, None)
+
+    @property
+    def gyro(self):
+        """Gives the raw gyroscope reading in radians per second.
+        Returns an empty tuple of length 3 when this property has been disabled by the current mode.
+        """
+        if self.mode not in [0x00, 0x01, 0x02, 0x04, 0x09, 0x0a]:
+            return self._gyro
+        return (None, None, None)
+
+    @property
+    def euler(self):
+        """Gives the calculated orientation angles, in degrees.
+        Returns an empty tuple of length 3 when this property has been disabled by the current mode.
+        """
+        if self.mode in [0x09, 0x0b, 0x0c]:
+            return self._euler
+        return (None, None, None)
+
+    @property
+    def quaternion(self):
+        """Gives the calculated orientation as a quaternion.
+        Returns an empty tuple of length 3 when this property has been disabled by the current mode.
+        """
+        if self.mode in [0x09, 0x0b, 0x0c]:
+            return self._quaternion
+        return (None, None, None, None)
+
+    @property
+    def linear_acceleration(self):
+        """Returns the linear acceleration, without gravity, in m/s.
+        Returns an empty tuple of length 3 when this property has been disabled by the current mode.
+        """
+        if self.mode in [0x09, 0x0b, 0x0c]:
+            return self._linear_acceleration
+        return (None, None, None)
+
+    @property
+    def gravity(self):
+        """Returns the gravity vector, without acceleration in m/s.
+        Returns an empty tuple of length 3 when this property has been disabled by the current mode.
+        """
+        if self.mode in [0x09, 0x0b, 0x0c]:
+            return self._gravity
+        return (None, None, None)
