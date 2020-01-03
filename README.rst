@@ -9,8 +9,8 @@ Introduction
     :target: https://adafru.it/discord
     :alt: Discord
 
-.. image:: https://travis-ci.com/adafruit/Adafruit_CircuitPython_BNO055.svg?branch=master
-    :target: https://travis-ci.com/adafruit/Adafruit_CircuitPython_BNO055
+.. image:: https://github.com/adafruit/Adafruit_CircuitPython_BNO055/workflows/Build%20CI/badge.svg
+    :target: https://github.com/adafruit/Adafruit_CircuitPython_BNO055/actions/
     :alt: Build Status
 
 
