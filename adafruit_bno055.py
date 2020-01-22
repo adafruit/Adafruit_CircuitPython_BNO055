@@ -62,6 +62,11 @@ _POWER_SUSPEND = const(0x02)
 _MODE_REGISTER = const(0x3d)
 _PAGE_REGISTER = const(0x07)
 _CALIBRATION_REGISTER = const(0x35)
+_OFFSET_ACCEL_REGISTER = const(0x55)
+_OFFSET_MAGNET_REGISTER = const(0x5b)
+_OFFSET_GYRO_REGISTER = const(0x61)
+_RADIUS_ACCEL_REGISTER = const(0x67)
+_RADIUS_MAGNET_REGISTER = const(0x69)
 _TRIGGER_REGISTER = const(0x3f)
 _POWER_REGISTER = const(0x3e)
 _ID_REGISTER = const(0x00)
@@ -85,6 +90,26 @@ class _ReadOnlyUnaryStruct(UnaryStruct): # pylint: disable=too-few-public-method
     def __set__(self, obj, value):
         raise NotImplementedError()
 
+class _ModeStruct(Struct): # pylint: disable=too-few-public-methods
+    def __init__(self, register_address, struct_format, mode):
+        super().__init__(register_address, struct_format)
+        self.mode = mode
+
+    def __get__(self, obj, objtype=None):
+        last_mode = obj.mode
+        obj.mode = self.mode
+        result = super().__get__(obj, objtype)
+        obj.mode = last_mode
+        # single value comes back as a one-element tuple
+        return result[0] if isinstance(result, tuple) and len(result) == 1 else result
+
+    def __set__(self, obj, value):
+        last_mode = obj.mode
+        obj.mode = self.mode
+        # underlying __set__() expects a tuple
+        set_val = value if isinstance(value, tuple) else (value,)
+        super().__set__(obj, set_val)
+        obj.mode = last_mode
 
 class BNO055:
     """
@@ -100,6 +125,18 @@ class BNO055:
     _linear_acceleration = _ScaledReadOnlyStruct(0x28, '<hhh', 1/100)
     _gravity = _ScaledReadOnlyStruct(0x2e, '<hhh', 1/100)
 
+
+    offsets_accelerometer = _ModeStruct(_OFFSET_ACCEL_REGISTER, '<hhh', CONFIG_MODE)
+    """Calibration offsets for the accelerometer"""
+    offsets_magnetometer = _ModeStruct(_OFFSET_MAGNET_REGISTER, '<hhh', CONFIG_MODE)
+    """Calibration offsets for the magnetometer"""
+    offsets_gyroscope = _ModeStruct(_OFFSET_GYRO_REGISTER, '<hhh', CONFIG_MODE)
+    """Calibration offsets for the gyroscope"""
+
+    radius_accelerometer = _ModeStruct(_RADIUS_ACCEL_REGISTER, '<h', CONFIG_MODE)
+    """Radius for accelerometer (cm?)"""
+    radius_magnetometer = _ModeStruct(_RADIUS_MAGNET_REGISTER, '<h', CONFIG_MODE)
+    """Radius for magnetometer (cm?)"""
 
     def __init__(self, i2c, address=0x28):
         self.i2c_device = I2CDevice(i2c, address)
