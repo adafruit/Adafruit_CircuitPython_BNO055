@@ -28,14 +28,13 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 import json
-import logging
 import threading
 import time
 
-from flask import *
-
 import board
 import busio
+import flask
+
 import adafruit_bno055
 
 i2c = busio.I2C(board.SCL, board.SDA)
@@ -65,7 +64,7 @@ CALIBRATION_FILE = "calibration.json"
 
 
 # Create flask application.
-app = Flask(__name__)
+app = flask.Flask(__name__)
 
 # Global state to keep track of the latest readings from the BNO055 sensor.
 # This will be accessed from multiple threads so care needs to be taken to
@@ -144,7 +143,7 @@ def start_bno_thread():
     # this is the only spot to put code that can only run once after starting.
     # See this SO question for more context:
     #   http://stackoverflow.com/questions/24617795/starting-thread-while-running-flask-with-debug
-    global bno_thread
+    global bno_thread  # pylint: disable=global-statement
     # Kick off BNO055 reading thread.
     bno_thread = threading.Thread(target=read_bno)
     bno_thread.daemon = True  # Don't let the BNO reading thread block exiting.
@@ -155,7 +154,7 @@ def start_bno_thread():
 def bno_path():
     # Return SSE response and call bno_sse function to stream sensor data to
     # the webpage.
-    return Response(bno_sse(), mimetype="text/event-stream")
+    return flask.Response(bno_sse(), mimetype="text/event-stream")
 
 
 @app.route("/save_calibration", methods=["POST"])
@@ -178,7 +177,7 @@ def load_calibration():
 
 @app.route("/")
 def root():
-    return render_template("index.html")
+    return flask.render_template("index.html")
 
 
 if __name__ == "__main__":
