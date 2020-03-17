@@ -39,7 +39,7 @@ from adafruit_register.i2c_struct import Struct, UnaryStruct
 __version__ = "0.0.0-auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_BNO055.git"
 
-_CHIP_ID = const(0xa0)
+_CHIP_ID = const(0xA0)
 
 CONFIG_MODE = const(0x00)
 ACCONLY_MODE = const(0x01)
@@ -51,31 +51,30 @@ MAGGYRO_MODE = const(0x06)
 AMG_MODE = const(0x07)
 IMUPLUS_MODE = const(0x08)
 COMPASS_MODE = const(0x09)
-M4G_MODE = const(0x0a)
-NDOF_FMC_OFF_MODE = const(0x0b)
-NDOF_MODE = const(0x0c)
+M4G_MODE = const(0x0A)
+NDOF_FMC_OFF_MODE = const(0x0B)
+NDOF_MODE = const(0x0C)
 
 _POWER_NORMAL = const(0x00)
 _POWER_LOW = const(0x01)
 _POWER_SUSPEND = const(0x02)
 
-_MODE_REGISTER = const(0x3d)
+_MODE_REGISTER = const(0x3D)
 _PAGE_REGISTER = const(0x07)
 _CALIBRATION_REGISTER = const(0x35)
 _OFFSET_ACCEL_REGISTER = const(0x55)
-_OFFSET_MAGNET_REGISTER = const(0x5b)
+_OFFSET_MAGNET_REGISTER = const(0x5B)
 _OFFSET_GYRO_REGISTER = const(0x61)
 _RADIUS_ACCEL_REGISTER = const(0x67)
 _RADIUS_MAGNET_REGISTER = const(0x69)
-_TRIGGER_REGISTER = const(0x3f)
-_POWER_REGISTER = const(0x3e)
+_TRIGGER_REGISTER = const(0x3F)
+_POWER_REGISTER = const(0x3E)
 _ID_REGISTER = const(0x00)
 
 
-class _ScaledReadOnlyStruct(Struct): # pylint: disable=too-few-public-methods
+class _ScaledReadOnlyStruct(Struct):  # pylint: disable=too-few-public-methods
     def __init__(self, register_address, struct_format, scale):
-        super(_ScaledReadOnlyStruct, self).__init__(
-            register_address, struct_format)
+        super(_ScaledReadOnlyStruct, self).__init__(register_address, struct_format)
         self.scale = scale
 
     def __get__(self, obj, objtype=None):
@@ -86,11 +85,12 @@ class _ScaledReadOnlyStruct(Struct): # pylint: disable=too-few-public-methods
         raise NotImplementedError()
 
 
-class _ReadOnlyUnaryStruct(UnaryStruct): # pylint: disable=too-few-public-methods
+class _ReadOnlyUnaryStruct(UnaryStruct):  # pylint: disable=too-few-public-methods
     def __set__(self, obj, value):
         raise NotImplementedError()
 
-class _ModeStruct(Struct): # pylint: disable=too-few-public-methods
+
+class _ModeStruct(Struct):  # pylint: disable=too-few-public-methods
     def __init__(self, register_address, struct_format, mode):
         super().__init__(register_address, struct_format)
         self.mode = mode
@@ -111,31 +111,31 @@ class _ModeStruct(Struct): # pylint: disable=too-few-public-methods
         super().__set__(obj, set_val)
         obj.mode = last_mode
 
+
 class BNO055:
     """
     Driver for the BNO055 9DOF IMU sensor.
     """
 
-    _temperature = _ReadOnlyUnaryStruct(0x34, 'b')
-    _acceleration = _ScaledReadOnlyStruct(0x08, '<hhh', 1/100)
-    _magnetic = _ScaledReadOnlyStruct(0x0e, '<hhh', 1/16)
-    _gyro = _ScaledReadOnlyStruct(0x14, '<hhh', 0.001090830782496456)
-    _euler = _ScaledReadOnlyStruct(0x1a, '<hhh', 1/16)
-    _quaternion = _ScaledReadOnlyStruct(0x20, '<hhhh', 1/(1<<14))
-    _linear_acceleration = _ScaledReadOnlyStruct(0x28, '<hhh', 1/100)
-    _gravity = _ScaledReadOnlyStruct(0x2e, '<hhh', 1/100)
+    _temperature = _ReadOnlyUnaryStruct(0x34, "b")
+    _acceleration = _ScaledReadOnlyStruct(0x08, "<hhh", 1 / 100)
+    _magnetic = _ScaledReadOnlyStruct(0x0E, "<hhh", 1 / 16)
+    _gyro = _ScaledReadOnlyStruct(0x14, "<hhh", 0.001090830782496456)
+    _euler = _ScaledReadOnlyStruct(0x1A, "<hhh", 1 / 16)
+    _quaternion = _ScaledReadOnlyStruct(0x20, "<hhhh", 1 / (1 << 14))
+    _linear_acceleration = _ScaledReadOnlyStruct(0x28, "<hhh", 1 / 100)
+    _gravity = _ScaledReadOnlyStruct(0x2E, "<hhh", 1 / 100)
 
-
-    offsets_accelerometer = _ModeStruct(_OFFSET_ACCEL_REGISTER, '<hhh', CONFIG_MODE)
+    offsets_accelerometer = _ModeStruct(_OFFSET_ACCEL_REGISTER, "<hhh", CONFIG_MODE)
     """Calibration offsets for the accelerometer"""
-    offsets_magnetometer = _ModeStruct(_OFFSET_MAGNET_REGISTER, '<hhh', CONFIG_MODE)
+    offsets_magnetometer = _ModeStruct(_OFFSET_MAGNET_REGISTER, "<hhh", CONFIG_MODE)
     """Calibration offsets for the magnetometer"""
-    offsets_gyroscope = _ModeStruct(_OFFSET_GYRO_REGISTER, '<hhh', CONFIG_MODE)
+    offsets_gyroscope = _ModeStruct(_OFFSET_GYRO_REGISTER, "<hhh", CONFIG_MODE)
     """Calibration offsets for the gyroscope"""
 
-    radius_accelerometer = _ModeStruct(_RADIUS_ACCEL_REGISTER, '<h', CONFIG_MODE)
+    radius_accelerometer = _ModeStruct(_RADIUS_ACCEL_REGISTER, "<h", CONFIG_MODE)
     """Radius for accelerometer (cm?)"""
-    radius_magnetometer = _ModeStruct(_RADIUS_MAGNET_REGISTER, '<h', CONFIG_MODE)
+    radius_magnetometer = _ModeStruct(_RADIUS_MAGNET_REGISTER, "<h", CONFIG_MODE)
     """Radius for magnetometer (cm?)"""
 
     def __init__(self, i2c, address=0x28):
@@ -161,8 +161,7 @@ class BNO055:
     def _read_register(self, register):
         self.buffer[0] = register
         with self.i2c_device as i2c:
-            i2c.write_then_readinto(self.buffer, self.buffer,
-                                    out_end=1, in_start=1)
+            i2c.write_then_readinto(self.buffer, self.buffer, out_end=1, in_start=1)
         return self.buffer[1]
 
     def _reset(self):
@@ -170,7 +169,7 @@ class BNO055:
         self.mode = CONFIG_MODE
         try:
             self._write_register(_TRIGGER_REGISTER, 0x20)
-        except OSError: # error due to the chip resetting
+        except OSError:  # error due to the chip resetting
             pass
         # wait for the chip to reset (650 ms typ.)
         time.sleep(0.7)
@@ -262,7 +261,6 @@ class BNO055:
         self.mode = last_mode
         time.sleep(0.01)
 
-
     @property
     def temperature(self):
         """Measures the temperature of the chip in degrees Celsius."""
@@ -291,7 +289,7 @@ class BNO055:
         """Gives the raw gyroscope reading in radians per second.
         Returns an empty tuple of length 3 when this property has been disabled by the current mode.
         """
-        if self.mode not in [0x00, 0x01, 0x02, 0x04, 0x09, 0x0a]:
+        if self.mode not in [0x00, 0x01, 0x02, 0x04, 0x09, 0x0A]:
             return self._gyro
         return (None, None, None)
 
@@ -300,7 +298,7 @@ class BNO055:
         """Gives the calculated orientation angles, in degrees.
         Returns an empty tuple of length 3 when this property has been disabled by the current mode.
         """
-        if self.mode in [0x09, 0x0b, 0x0c]:
+        if self.mode in [0x09, 0x0B, 0x0C]:
             return self._euler
         return (None, None, None)
 
@@ -309,7 +307,7 @@ class BNO055:
         """Gives the calculated orientation as a quaternion.
         Returns an empty tuple of length 3 when this property has been disabled by the current mode.
         """
-        if self.mode in [0x09, 0x0b, 0x0c]:
+        if self.mode in [0x09, 0x0B, 0x0C]:
             return self._quaternion
         return (None, None, None, None)
 
@@ -318,7 +316,7 @@ class BNO055:
         """Returns the linear acceleration, without gravity, in m/s.
         Returns an empty tuple of length 3 when this property has been disabled by the current mode.
         """
-        if self.mode in [0x09, 0x0b, 0x0c]:
+        if self.mode in [0x09, 0x0B, 0x0C]:
             return self._linear_acceleration
         return (None, None, None)
 
@@ -327,6 +325,6 @@ class BNO055:
         """Returns the gravity vector, without acceleration in m/s.
         Returns an empty tuple of length 3 when this property has been disabled by the current mode.
         """
-        if self.mode in [0x09, 0x0b, 0x0c]:
+        if self.mode in [0x09, 0x0B, 0x0C]:
             return self._gravity
         return (None, None, None)
