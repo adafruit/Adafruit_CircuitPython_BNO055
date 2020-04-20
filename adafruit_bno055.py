@@ -233,6 +233,10 @@ class BNO055:
         return self._temperature
 
     @property
+    def _temperature(self):
+        raise NotImplementedError("Must be implemented.")
+
+    @property
     def acceleration(self):
         """Gives the raw accelerometer readings, in m/s.
         Returns an empty tuple of length 3 when this property has been disabled by the current mode.
@@ -240,6 +244,10 @@ class BNO055:
         if self.mode not in [0x00, 0x02, 0x03, 0x06]:
             return self._acceleration
         return (None, None, None)
+
+    @property
+    def _acceleration(self):
+        raise NotImplementedError("Must be implemented.")
 
     @property
     def magnetic(self):
@@ -251,6 +259,10 @@ class BNO055:
         return (None, None, None)
 
     @property
+    def _magnetic(self):
+        raise NotImplementedError("Must be implemented.")
+
+    @property
     def gyro(self):
         """Gives the raw gyroscope reading in radians per second.
         Returns an empty tuple of length 3 when this property has been disabled by the current mode.
@@ -258,6 +270,10 @@ class BNO055:
         if self.mode not in [0x00, 0x01, 0x02, 0x04, 0x09, 0x0A]:
             return self._gyro
         return (None, None, None)
+
+    @property
+    def _gyro(self):
+        raise NotImplementedError("Must be implemented.")
 
     @property
     def euler(self):
@@ -269,6 +285,10 @@ class BNO055:
         return (None, None, None)
 
     @property
+    def _euler(self):
+        raise NotImplementedError("Must be implemented.")
+
+    @property
     def quaternion(self):
         """Gives the calculated orientation as a quaternion.
         Returns an empty tuple of length 3 when this property has been disabled by the current mode.
@@ -276,6 +296,10 @@ class BNO055:
         if self.mode in [0x09, 0x0B, 0x0C]:
             return self._quaternion
         return (None, None, None, None)
+
+    @property
+    def _quaternion(self):
+        raise NotImplementedError("Must be implemented.")
 
     @property
     def linear_acceleration(self):
@@ -287,6 +311,10 @@ class BNO055:
         return (None, None, None)
 
     @property
+    def _linear_acceleration(self):
+        raise NotImplementedError("Must be implemented.")
+
+    @property
     def gravity(self):
         """Returns the gravity vector, without acceleration in m/s.
         Returns an empty tuple of length 3 when this property has been disabled by the current mode.
@@ -294,6 +322,10 @@ class BNO055:
         if self.mode in [0x09, 0x0B, 0x0C]:
             return self._gravity
         return (None, None, None)
+
+    @property
+    def _gravity(self):
+        raise NotImplementedError("Must be implemented.")
 
     def _write_register(self, register, value):
         raise NotImplementedError("Must be implemented.")
@@ -356,7 +388,7 @@ class BNO055_UART(BNO055):
         self._uart.baudrate = 115200
         super().__init__()
 
-    def _write_register(self, register, data):
+    def _write_register(self, register, data):  # pylint: disable=arguments-differ
         if not isinstance(data, bytes):
             data = bytes([data])
         self._uart.write(bytes([0xAA, 0x00, register, len(data)]) + data)
@@ -367,7 +399,7 @@ class BNO055_UART(BNO055):
         if resp[0] != 0xEE or resp[1] != 0x01:
             raise RuntimeError("UART write error: {}".format(resp[1]))
 
-    def _read_register(self, register, length=1):
+    def _read_register(self, register, length=1):  # pylint: disable=arguments-differ
         self._uart.write(bytes([0xAA, 0x01, register, length]))
         time.sleep(0.1)
         resp = self._uart.read(self._uart.in_waiting)
