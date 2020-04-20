@@ -72,6 +72,7 @@ _TRIGGER_REGISTER = const(0x3F)
 _POWER_REGISTER = const(0x3E)
 _ID_REGISTER = const(0x00)
 
+
 class _ScaledReadOnlyStruct(Struct):  # pylint: disable=too-few-public-methods
     def __init__(self, register_address, struct_format, scale):
         super(_ScaledReadOnlyStruct, self).__init__(register_address, struct_format)
@@ -300,6 +301,7 @@ class BNO055:
     def _read_register(self, register):
         raise NotImplementedError("Must be implemented.")
 
+
 class BNO055_I2C(BNO055):
     """
     Driver for the BNO055 9DOF IMU sensor via I2C.
@@ -348,13 +350,16 @@ class BNO055_UART(BNO055):
     """
     Driver for the BNO055 9DOF IMU sensor via UART.
     """
+
     def __init__(self, uart):
         self._uart = uart
         self._uart.baudrate = 115200
         super().__init__()
 
-    def _write_register(self, register, value):
-        self._uart.write(bytes([0xAA, 0x00, register, 0x01, value]))
+    def _write_register(self, register, data):
+        if not isinstance(data, bytes):
+            data = bytes([data])
+        self._uart.write(bytes([0xAA, 0x00, register, len(data)]) + data)
         time.sleep(0.1)
         resp = self._uart.read(self._uart.in_waiting)
         if len(resp) < 2:
@@ -381,46 +386,89 @@ class BNO055_UART(BNO055):
     @property
     def _acceleration(self):
         resp = struct.unpack("<hhh", self._read_register(0x08, 6))
-        return  tuple([x / 100 for x in resp])
+        return tuple([x / 100 for x in resp])
 
     @property
     def _magnetic(self):
         resp = struct.unpack("<hhh", self._read_register(0x0E, 6))
-        return  tuple([x / 16 for x in resp])
+        return tuple([x / 16 for x in resp])
 
     @property
     def _gyro(self):
         resp = struct.unpack("<hhh", self._read_register(0x0E, 6))
-        return  tuple([x * 0.001090830782496456 for x in resp])
+        return tuple([x * 0.001090830782496456 for x in resp])
 
     @property
     def _euler(self):
         resp = struct.unpack("<hhh", self._read_register(0x1A, 6))
-        return  tuple([x / 16 for x in resp])
+        return tuple([x / 16 for x in resp])
 
     @property
     def _quaternion(self):
         resp = struct.unpack("<hhhh", self._read_register(0x20, 8))
-        return  tuple([x / (1 << 14) for x in resp])
+        return tuple([x / (1 << 14) for x in resp])
 
     @property
     def _linear_acceleration(self):
         resp = struct.unpack("<hhh", self._read_register(0x28, 6))
-        return  tuple([x / 100 for x in resp])
+        return tuple([x / 100 for x in resp])
 
     @property
     def _gravity(self):
         resp = struct.unpack("<hhh", self._read_register(0x2E, 6))
-        return  tuple([x / 100 for x in resp])
+        return tuple([x / 100 for x in resp])
 
-    # offsets_accelerometer = _ModeStruct(_OFFSET_ACCEL_REGISTER, "<hhh", CONFIG_MODE)
-    # """Calibration offsets for the accelerometer"""
-    # offsets_magnetometer = _ModeStruct(_OFFSET_MAGNET_REGISTER, "<hhh", CONFIG_MODE)
-    # """Calibration offsets for the magnetometer"""
-    # offsets_gyroscope = _ModeStruct(_OFFSET_GYRO_REGISTER, "<hhh", CONFIG_MODE)
-    # """Calibration offsets for the gyroscope"""
+    @property
+    def offsets_accelerometer(self):
+        """Calibration offsets for the accelerometer"""
+        return struct.unpack("<hhh", self._read_register(_OFFSET_ACCEL_REGISTER, 6))
 
-    # radius_accelerometer = _ModeStruct(_RADIUS_ACCEL_REGISTER, "<h", CONFIG_MODE)
-    # """Radius for accelerometer (cm?)"""
-    # radius_magnetometer = _ModeStruct(_RADIUS_MAGNET_REGISTER, "<h", CONFIG_MODE)
-    # """Radius for magnetometer (cm?)"""
+    @offsets_accelerometer.setter
+    def offsets_accelerometer(self, offsets):
+        data = bytearray(6)
+        struct.pack_into("<hhh", data, 0, *offsets)
+        self._write_register(_OFFSET_ACCEL_REGISTER, bytes(data))
+
+    @property
+    def offsets_magnetometer(self):
+        """Calibration offsets for the magnetometer"""
+        return struct.unpack("<hhh", self._read_register(_OFFSET_MAGNET_REGISTER, 6))
+
+    @offsets_magnetometer.setter
+    def offsets_magnetometer(self, offsets):
+        data = bytearray(6)
+        struct.pack_into("<hhh", data, 0, *offsets)
+        self._write_register(_OFFSET_MAGNET_REGISTER, bytes(data))
+
+    @property
+    def offsets_gyroscope(self):
+        """Calibration offsets for the gyroscope"""
+        return struct.unpack("<hhh", self._read_register(_OFFSET_GYRO_REGISTER, 6))
+
+    @offsets_gyroscope.setter
+    def offsets_gyroscope(self, offsets):
+        data = bytearray(6)
+        struct.pack_into("<hhh", data, 0, *offsets)
+        self._write_register(_OFFSET_GYRO_REGISTER, bytes(data))
+
+    @property
+    def radius_accelerometer(self):
+        """Radius for accelerometer (cm?)"""
+        return struct.unpack("<h", self._read_register(_RADIUS_ACCEL_REGISTER, 2))[0]
+
+    @radius_accelerometer.setter
+    def radius_accelerometer(self, radius):
+        data = bytearray(2)
+        struct.pack_into("<h", data, 0, radius)
+        self._write_register(_RADIUS_ACCEL_REGISTER, bytes(data))
+
+    @property
+    def radius_magnetometer(self):
+        """Radius for magnetometer (cm?)"""
+        return struct.unpack("<h", self._read_register(_RADIUS_MAGNET_REGISTER, 2))[0]
+
+    @radius_magnetometer.setter
+    def radius_magnetometer(self, radius):
+        data = bytearray(2)
+        struct.pack_into("<h", data, 0, radius)
+        self._write_register(_RADIUS_MAGNET_REGISTER, bytes(data))
