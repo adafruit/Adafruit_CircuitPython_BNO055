@@ -8,8 +8,8 @@ i2c = busio.I2C(board.SCL, board.SDA)
 sensor = adafruit_bno055.BNO055_I2C(i2c)
 
 # User these lines for UART
-#uart = busio.UART(board.TX, board.RX)
-#sensor = adafruit_bno055.BNO055_UART(uart)
+# uart = busio.UART(board.TX, board.RX)
+# sensor = adafruit_bno055.BNO055_UART(uart)
 
 while True:
     print("Temperature: {} degrees C".format(sensor.temperature))
