@@ -427,7 +427,7 @@ class BNO055_UART(BNO055):
 
     @property
     def _gyro(self):
-        resp = struct.unpack("<hhh", self._read_register(0x0E, 6))
+        resp = struct.unpack("<hhh", self._read_register(0x14, 6))
         return tuple([x * 0.001090830782496456 for x in resp])
 
     @property
