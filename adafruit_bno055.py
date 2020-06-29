@@ -392,7 +392,7 @@ class BNO055_UART(BNO055):
         if not isinstance(data, bytes):
             data = bytes([data])
         self._uart.write(bytes([0xAA, 0x00, register, len(data)]) + data)
-        time.sleep(0.1)
+        time.sleep(0.01)
         resp = self._uart.read(self._uart.in_waiting)
         if len(resp) < 2:
             raise OSError("UART access error.")
@@ -401,7 +401,7 @@ class BNO055_UART(BNO055):
 
     def _read_register(self, register, length=1):  # pylint: disable=arguments-differ
         self._uart.write(bytes([0xAA, 0x01, register, length]))
-        time.sleep(0.1)
+        time.sleep(0.01)
         resp = self._uart.read(self._uart.in_waiting)
         if len(resp) < 2:
             raise OSError("UART access error.")
