@@ -143,44 +143,108 @@ class BNO055:
     @property
     def mode(self):
         """
-        Switch the mode of operation and return the previous mode.
+        .. code-block::
 
-        Mode of operation defines which sensors are enabled and whether the
-        measurements are absolute or relative.
-        If a sensor is disabled, it will return an empty tuple.
-
-        legend: x=on, -=off
-        +------------------+-------+---------+------+----------+
-        | Mode             | Accel | Compass | Gyro | Absolute |
-        +==================+=======+=========+======+==========+
-        | CONFIG_MODE      |   -   |   -     |  -   |     -    |
-        +------------------+-------+---------+------+----------+
-        | ACCONLY_MODE     |   X   |   -     |  -   |     -    |
-        +------------------+-------+---------+------+----------+
-        | MAGONLY_MODE     |   -   |   X     |  -   |     -    |
-        +------------------+-------+---------+------+----------+
-        | GYRONLY_MODE     |   -   |   -     |  X   |     -    |
-        +------------------+-------+---------+------+----------+
-        | ACCMAG_MODE      |   X   |   X     |  -   |     -    |
-        +------------------+-------+---------+------+----------+
-        | ACCGYRO_MODE     |   X   |   -     |  X   |     -    |
-        +------------------+-------+---------+------+----------+
-        | MAGGYRO_MODE     |   -   |   X     |  X   |     -    |
-        +------------------+-------+---------+------+----------+
-        | AMG_MODE         |   X   |   X     |  X   |     -    |
-        +------------------+-------+---------+------+----------+
-        | IMUPLUS_MODE     |   X   |   -     |  X   |     -    |
-        +------------------+-------+---------+------+----------+
-        | COMPASS_MODE     |   X   |   X     |  -   |     X    |
-        +------------------+-------+---------+------+----------+
-        | M4G_MODE         |   X   |   X     |  -   |     -    |
-        +------------------+-------+---------+------+----------+
-        | NDOF_FMC_OFF_MODE|   X   |   X     |  X   |     X    |
-        +------------------+-------+---------+------+----------+
-        | NDOF_MODE        |   X   |   X     |  X   |     X    |
-        +------------------+-------+---------+------+----------+
+            legend: x=on, -=off
+            +------------------+-------+---------+------+----------+
+            | Mode             | Accel | Compass | Gyro | Absolute |
+            +==================+=======+=========+======+==========+
+            | CONFIG_MODE      |   -   |   -     |  -   |     -    |
+            +------------------+-------+---------+------+----------+
+            | ACCONLY_MODE     |   X   |   -     |  -   |     -    |
+            +------------------+-------+---------+------+----------+
+            | MAGONLY_MODE     |   -   |   X     |  -   |     -    |
+            +------------------+-------+---------+------+----------+
+            | GYRONLY_MODE     |   -   |   -     |  X   |     -    |
+            +------------------+-------+---------+------+----------+
+            | ACCMAG_MODE      |   X   |   X     |  -   |     -    |
+            +------------------+-------+---------+------+----------+
+            | ACCGYRO_MODE     |   X   |   -     |  X   |     -    |
+            +------------------+-------+---------+------+----------+
+            | MAGGYRO_MODE     |   -   |   X     |  X   |     -    |
+            +------------------+-------+---------+------+----------+
+            | AMG_MODE         |   X   |   X     |  X   |     -    |
+            +------------------+-------+---------+------+----------+
+            | IMUPLUS_MODE     |   X   |   -     |  X   |     -    |
+            +------------------+-------+---------+------+----------+
+            | COMPASS_MODE     |   X   |   X     |  -   |     X    |
+            +------------------+-------+---------+------+----------+
+            | M4G_MODE         |   X   |   X     |  -   |     -    |
+            +------------------+-------+---------+------+----------+
+            | NDOF_FMC_OFF_MODE|   X   |   X     |  X   |     X    |
+            +------------------+-------+---------+------+----------+
+            | NDOF_MODE        |   X   |   X     |  X   |     X    |
+            +------------------+-------+---------+------+----------+
 
         The default mode is ``NDOF_MODE``.
+
+        | You can set the mode using the line below:
+        | ``sensor.mode = adafruit_bno055.ACCONLY_MODE``
+        | replacing ``ACCONLY_MODE`` with the mode you want to use
+
+        .. data:: CONFIG_MODE
+
+           This mode is used to configure BNO, wherein all output data is reset to zero and sensor fusion
+           is halted.
+
+        .. data:: ACCONLY_MODE
+
+           In this mode, the BNO055 behaves like a stand-alone acceleration sensor. In this mode the
+           other sensors (magnetometer, gyro) are suspended to lower the power consumption.
+
+        .. data:: MAGONLY_MODE
+
+           In MAGONLY mode, the BNO055 behaves like a stand-alone magnetometer, with acceleration sensor
+           and gyroscope being suspended.
+
+        .. data:: GYRONLY_MODE
+
+           In GYROONLY mode, the BNO055 behaves like a stand-alone gyroscope, with acceleration sensor and
+           magnetometer being suspended.
+
+        .. data:: ACCMAG_MODE
+
+           Both accelerometer and magnetometer are switched on, the user can read the data from these two
+           sensors.
+
+        .. data:: ACCGYRO_MODE
+
+           Both accelerometer and gyroscope are switched on; the user can read the data from these two
+           sensors.
+
+        .. data:: MAGGYRO_MODE
+
+           Both magnetometer and gyroscope are switched on, the user can read the data from these two
+           sensors.
+
+        .. data:: AMG_MODE
+
+           All three sensors accelerometer, magnetometer and gyroscope are switched on.
+
+        .. data:: IMUPLUS_MODE
+
+           In the IMU mode the relative orientation of the BNO055 in space is calculated from the
+           accelerometer and gyroscope data. The calculation is fast (i.e. high output data rate).
+
+        .. data:: COMPASS_MODE
+
+           The COMPASS mode is intended to measure the magnetic earth field and calculate the geographic
+           direction.
+
+        .. data:: M4G_MODE
+
+           The M4G mode is similar to the IMU mode, but instead of using the gyroscope signal to detect
+           rotation, the changing orientation of the magnetometer in the magnetic field is used.
+
+        .. data:: NDOF_FMC_OFF_MODE
+
+           This fusion mode is same as NDOF mode, but with the Fast Magnetometer Calibration turned ‘OFF’.
+
+        .. data:: NDOF_MODE
+
+           This is a fusion mode with 9 degrees of freedom where the fused absolute orientation data is
+           calculated from accelerometer, gyroscope and the magnetometer.
+
         """
         return self._read_register(_MODE_REGISTER)
 
