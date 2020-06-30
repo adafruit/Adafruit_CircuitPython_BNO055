@@ -56,12 +56,32 @@ M4G_MODE = const(0x0A)
 NDOF_FMC_OFF_MODE = const(0x0B)
 NDOF_MODE = const(0x0C)
 
+ACC_2G = const(0x00)
+ACC_4G = const(0x01)
+ACC_8G = const(0x02)
+ACC_16G = const(0x03)
+ACC_7_81HZ = const(0x00)
+ACC_15_63HZ = const(0x04)
+ACC_31_25HZ = const(0x08)
+ACC_62_5HZ = const(0x0C)
+ACC_125HZ = const(0x10)
+ACC_250HZ = const(0x14)
+ACC_500HZ = const(0x18)
+ACC_1000HZ = const(0x1C)
+ACC_NORMAL_MODE = const(0x00)
+ACC_SUSPEND_MODE = const(0x20)
+ACC_LOWPOWER1_MODE = const(0x40)
+ACC_STANDBY_MODE = const(0x60)
+ACC_LOWPOWER2_MODE = const(0x80)
+ACC_DEEPSUSPEND_MODE = const(0xA0)
+
 _POWER_NORMAL = const(0x00)
 _POWER_LOW = const(0x01)
 _POWER_SUSPEND = const(0x02)
 
 _MODE_REGISTER = const(0x3D)
 _PAGE_REGISTER = const(0x07)
+_ACC_CONFIG_REGISTER = const(0x08)
 _CALIBRATION_REGISTER = const(0x35)
 _OFFSET_ACCEL_REGISTER = const(0x55)
 _OFFSET_MAGNET_REGISTER = const(0x5B)
@@ -326,6 +346,15 @@ class BNO055:
     @property
     def _gravity(self):
         raise NotImplementedError("Must be implemented.")
+
+    def accel_config(self, rng=ACC_4G, bandwidth=ACC_62_5HZ, acc_mode=ACC_NORMAL_MODE):
+        """Allows you to set the settings for the accelerometer"""
+        if self.mode not in [0x08, 0x09, 0x0A, 0x0B, 0x0C]:
+            self._write_register(_ACC_CONFIG_REGISTER, acc_mode | bandwidth | rng)
+            time.sleep(0.1)
+            value = self._read_register(_ACC_CONFIG_REGISTER)
+            return value
+        raise RuntimeError("Mode must not be a fusion mode")
 
     def _write_register(self, register, value):
         raise NotImplementedError("Must be implemented.")
