@@ -22,7 +22,7 @@ while True:
         print("Linear acceleration (m/s^2): {}".format(sensor.linear_acceleration))
         print("Gravity (m/s^2): {}".format(sensor.gravity))
         print()
-    except RuntimeError:
-        continue
+    except RuntimeError as e:
+        print(e)
 
     time.sleep(1)
