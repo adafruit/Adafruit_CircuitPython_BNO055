@@ -12,17 +12,13 @@ sensor = adafruit_bno055.BNO055_I2C(i2c)
 # sensor = adafruit_bno055.BNO055_UART(uart)
 
 while True:
-    # Try/except only necessary when usuing UART mode
-    try:
-        print("Accelerometer (m/s^2): {}".format(sensor.acceleration))
-        print("Magnetometer (microteslas): {}".format(sensor.magnetic))
-        print("Gyroscope (rad/sec): {}".format(sensor.gyro))
-        print("Euler angle: {}".format(sensor.euler))
-        print("Quaternion: {}".format(sensor.quaternion))
-        print("Linear acceleration (m/s^2): {}".format(sensor.linear_acceleration))
-        print("Gravity (m/s^2): {}".format(sensor.gravity))
-        print()
-    except RuntimeError as e:
-        print(e)
+    print("Accelerometer (m/s^2): {}".format(sensor.acceleration))
+    print("Magnetometer (microteslas): {}".format(sensor.magnetic))
+    print("Gyroscope (rad/sec): {}".format(sensor.gyro))
+    print("Euler angle: {}".format(sensor.euler))
+    print("Quaternion: {}".format(sensor.quaternion))
+    print("Linear acceleration (m/s^2): {}".format(sensor.linear_acceleration))
+    print("Gravity (m/s^2): {}".format(sensor.gravity))
+    print()
 
     time.sleep(1)

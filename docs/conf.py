@@ -10,11 +10,7 @@ sys.path.insert(0, os.path.abspath(".."))
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = [
-    "sphinx.ext.autodoc",
-    "sphinx.ext.intersphinx",
-    "sphinx.ext.viewcode",
-]
+extensions = ["sphinx.ext.autodoc", "sphinx.ext.intersphinx", "sphinx.ext.viewcode"]
 
 # Uncomment the below if you use native CircuitPython modules such as
 # digitalio, micropython and busio. List the modules you use. Without it, the
@@ -144,7 +140,7 @@ latex_documents = [
         "Adafruit BNO055 Library Documentation",
         "Radomir Dopieralski",
         "manual",
-    ),
+    )
 ]
 
 # -- Options for manual page output ---------------------------------------
@@ -175,5 +171,5 @@ texinfo_documents = [
         "AdafruitBNO055Library",
         "One line description of project.",
         "Miscellaneous",
-    ),
+    )
 ]
