@@ -410,7 +410,7 @@ class BNO055_UART(BNO055):
                 pass
             resp = self._uart.read(self._uart.in_waiting)
             if len(resp) >= 2 and resp[0] == 0xBB:
-                i = 3
+                break
             i += 1
         if len(resp) < 2:
             raise OSError("UART access error.")
