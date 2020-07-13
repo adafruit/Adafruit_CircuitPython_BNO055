@@ -1,10 +1,19 @@
+"""
+This example demonstrates how to instantiate the
+Adafruit BNO055 Sensor using this library and just
+the I2C bus number.
+This example will only work on a Raspberry Pi
+and does require the i2c-gpio kernel module to be
+installed and enabled. Most Raspberry Pis will
+already have it installed.
+"""
+
 import time
-import board
 from adafruit_extended_bus import ExtendedI2C as I2C
 import adafruit_bno055
 
 # Create library object using our Extended Bus I2C port
-i2c = I2C(1) # Device is /dev/i2c-1
+i2c = I2C(1)  # Device is /dev/i2c-1
 sensor = adafruit_bno055.BNO055_I2C(i2c)
 
 while True:
