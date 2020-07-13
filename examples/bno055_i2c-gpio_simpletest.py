@@ -5,14 +5,19 @@ the I2C bus number.
 This example will only work on a Raspberry Pi
 and does require the i2c-gpio kernel module to be
 installed and enabled. Most Raspberry Pis will
-already have it installed.
+already have it installed, however most do not
+have it enabled. You will have to manually enable it
 """
 
 import time
 from adafruit_extended_bus import ExtendedI2C as I2C
 import adafruit_bno055
 
+# To enable i2c-gpio, add the line `dtoverlay=i2c-gpio` to /boot/config.txt
+# Then reboot the pi
+
 # Create library object using our Extended Bus I2C port
+# Use `ls /dev/i2c*` to find out what i2c devices are connected
 i2c = I2C(1)  # Device is /dev/i2c-1
 sensor = adafruit_bno055.BNO055_I2C(i2c)
 
