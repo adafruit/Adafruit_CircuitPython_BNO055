@@ -56,60 +56,60 @@ M4G_MODE = const(0x0A)
 NDOF_FMC_OFF_MODE = const(0x0B)
 NDOF_MODE = const(0x0C)
 
-ACCEL_2G = const(0x00) # For accel_range property
-ACCEL_4G = const(0x01) # Default
+ACCEL_2G = const(0x00)  # For accel_range property
+ACCEL_4G = const(0x01)  # Default
 ACCEL_8G = const(0x02)
 ACCEL_16G = const(0x03)
-ACCEL_7_81HZ = const(0x00) # For accel_bandwidth property
+ACCEL_7_81HZ = const(0x00)  # For accel_bandwidth property
 ACCEL_15_63HZ = const(0x04)
 ACCEL_31_25HZ = const(0x08)
-ACCEL_62_5HZ = const(0x0C) # Default
+ACCEL_62_5HZ = const(0x0C)  # Default
 ACCEL_125HZ = const(0x10)
 ACCEL_250HZ = const(0x14)
 ACCEL_500HZ = const(0x18)
 ACCEL_1000HZ = const(0x1C)
-ACCEL_NORMAL_MODE = const(0x00) # Default. For accel_mode property
+ACCEL_NORMAL_MODE = const(0x00)  # Default. For accel_mode property
 ACCEL_SUSPEND_MODE = const(0x20)
 ACCEL_LOWPOWER1_MODE = const(0x40)
 ACCEL_STANDBY_MODE = const(0x60)
 ACCEL_LOWPOWER2_MODE = const(0x80)
 ACCEL_DEEPSUSPEND_MODE = const(0xA0)
 
-GYRO_2000_DPS = const(0x00) # Default. For gyro_range property
+GYRO_2000_DPS = const(0x00)  # Default. For gyro_range property
 GYRO_1000_DPS = const(0x01)
 GYRO_500_DPS = const(0x02)
 GYRO_250_DPS = const(0x03)
 GYRO_125_DPS = const(0x04)
-GYRO_523HZ = const(0x00) # For gyro_bandwidth property
+GYRO_523HZ = const(0x00)  # For gyro_bandwidth property
 GYRO_230HZ = const(0x08)
 GYRO_116HZ = const(0x10)
 GYRO_47HZ = const(0x18)
 GYRO_23HZ = const(0x20)
 GYRO_12HZ = const(0x28)
 GYRO_64HZ = const(0x30)
-GYRO_32HZ = const(0x38) # Default
-GYRO_NORMAL_MODE = const(0x00) # Default. For gyro_mode property
+GYRO_32HZ = const(0x38)  # Default
+GYRO_NORMAL_MODE = const(0x00)  # Default. For gyro_mode property
 GYRO_FASTPOWERUP_MODE = const(0x01)
 GYRO_DEEPSUSPEND_MODE = const(0x02)
 GYRO_SUSPEND_MODE = const(0x03)
 GYRO_ADVANCEDPOWERSAVE_MODE = const(0x04)
 
-MAGNET_2HZ = const(0x00) # For magnet_rate property
+MAGNET_2HZ = const(0x00)  # For magnet_rate property
 MAGNET_6HZ = const(0x01)
 MAGNET_8HZ = const(0x02)
 MAGNET_10HZ = const(0x03)
 MAGNET_15HZ = const(0x04)
-MAGNET_20HZ = const(0x05) # Default
+MAGNET_20HZ = const(0x05)  # Default
 MAGNET_25HZ = const(0x06)
 MAGNET_30HZ = const(0x07)
-MAGNET_LOWPOWER_MODE = const(0x00) # For magnet_operation_mode property
-MAGNET_REGULAR_MODE = const(0x08) # Default
+MAGNET_LOWPOWER_MODE = const(0x00)  # For magnet_operation_mode property
+MAGNET_REGULAR_MODE = const(0x08)  # Default
 MAGNET_ENHANCEDREGULAR_MODE = const(0x10)
 MAGNET_ACCURACY_MODE = const(0x18)
-MAGNET_NORMAL_MODE = const(0x00) # for magnet_power_mode property
+MAGNET_NORMAL_MODE = const(0x00)  # for magnet_power_mode property
 MAGNET_SLEEP_MODE = const(0x20)
 MAGNET_SUSPEND_MODE = const(0x40)
-MAGNET_FORCEMODE_MODE = const(0x60) # Default
+MAGNET_FORCEMODE_MODE = const(0x60)  # Default
 
 _POWER_NORMAL = const(0x00)
 _POWER_LOW = const(0x01)
@@ -172,7 +172,7 @@ class _ModeStruct(Struct):  # pylint: disable=too-few-public-methods
         obj.mode = last_mode
 
 
-class BNO055:
+class BNO055:  # pylint: disable=too-many-public-methods
     """
     Base class for the BNO055 9DOF IMU sensor.
     """
