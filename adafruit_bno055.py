@@ -56,24 +56,60 @@ M4G_MODE = const(0x0A)
 NDOF_FMC_OFF_MODE = const(0x0B)
 NDOF_MODE = const(0x0C)
 
-ACC_2G = const(0x00)
-ACC_4G = const(0x01)
-ACC_8G = const(0x02)
-ACC_16G = const(0x03)
-ACC_7_81HZ = const(0x00)
-ACC_15_63HZ = const(0x04)
-ACC_31_25HZ = const(0x08)
-ACC_62_5HZ = const(0x0C)
-ACC_125HZ = const(0x10)
-ACC_250HZ = const(0x14)
-ACC_500HZ = const(0x18)
-ACC_1000HZ = const(0x1C)
-ACC_NORMAL_MODE = const(0x00)
-ACC_SUSPEND_MODE = const(0x20)
-ACC_LOWPOWER1_MODE = const(0x40)
-ACC_STANDBY_MODE = const(0x60)
-ACC_LOWPOWER2_MODE = const(0x80)
-ACC_DEEPSUSPEND_MODE = const(0xA0)
+ACCEL_2G = const(0x00) # For accel_range property
+ACCEL_4G = const(0x01) # Default
+ACCEL_8G = const(0x02)
+ACCEL_16G = const(0x03)
+ACCEL_7_81HZ = const(0x00) # For accel_bandwidth property
+ACCEL_15_63HZ = const(0x04)
+ACCEL_31_25HZ = const(0x08)
+ACCEL_62_5HZ = const(0x0C) # Default
+ACCEL_125HZ = const(0x10)
+ACCEL_250HZ = const(0x14)
+ACCEL_500HZ = const(0x18)
+ACCEL_1000HZ = const(0x1C)
+ACCEL_NORMAL_MODE = const(0x00) # Default. For accel_mode property
+ACCEL_SUSPEND_MODE = const(0x20)
+ACCEL_LOWPOWER1_MODE = const(0x40)
+ACCEL_STANDBY_MODE = const(0x60)
+ACCEL_LOWPOWER2_MODE = const(0x80)
+ACCEL_DEEPSUSPEND_MODE = const(0xA0)
+
+GYRO_2000_DPS = const(0x00) # Default. For gyro_range property
+GYRO_1000_DPS = const(0x01)
+GYRO_500_DPS = const(0x02)
+GYRO_250_DPS = const(0x03)
+GYRO_125_DPS = const(0x04)
+GYRO_523HZ = const(0x00) # For gyro_bandwidth property
+GYRO_230HZ = const(0x08)
+GYRO_116HZ = const(0x10)
+GYRO_47HZ = const(0x18)
+GYRO_23HZ = const(0x20)
+GYRO_12HZ = const(0x28)
+GYRO_64HZ = const(0x30)
+GYRO_32HZ = const(0x38) # Default
+GYRO_NORMAL_MODE = const(0x00) # Default. For gyro_mode property
+GYRO_FASTPOWERUP_MODE = const(0x01)
+GYRO_DEEPSUSPEND_MODE = const(0x02)
+GYRO_SUSPEND_MODE = const(0x03)
+GYRO_ADVANCEDPOWERSAVE_MODE = const(0x04)
+
+MAGNET_2HZ = const(0x00) # For magnet_rate property
+MAGNET_6HZ = const(0x01)
+MAGNET_8HZ = const(0x02)
+MAGNET_10HZ = const(0x03)
+MAGNET_15HZ = const(0x04)
+MAGNET_20HZ = const(0x05) # Default
+MAGNET_25HZ = const(0x06)
+MAGNET_30HZ = const(0x07)
+MAGNET_LOWPOWER_MODE = const(0x00) # For magnet_operation_mode property
+MAGNET_REGULAR_MODE = const(0x08) # Default
+MAGNET_ENHANCEDREGULAR_MODE = const(0x10)
+MAGNET_ACCURACY_MODE = const(0x18)
+MAGNET_NORMAL_MODE = const(0x00) # for magnet_power_mode property
+MAGNET_SLEEP_MODE = const(0x20)
+MAGNET_SUSPEND_MODE = const(0x40)
+MAGNET_FORCEMODE_MODE = const(0x60) # Default
 
 _POWER_NORMAL = const(0x00)
 _POWER_LOW = const(0x01)
@@ -81,7 +117,10 @@ _POWER_SUSPEND = const(0x02)
 
 _MODE_REGISTER = const(0x3D)
 _PAGE_REGISTER = const(0x07)
-_ACC_CONFIG_REGISTER = const(0x08)
+_ACCEL_CONFIG_REGISTER = const(0x08)
+_MAGNET_CONFIG_REGISTER = const(0x09)
+_GYRO_CONFIG_0_REGISTER = const(0x0A)
+_GYRO_CONFIG_1_REGISTER = const(0x0B)
 _CALIBRATION_REGISTER = const(0x35)
 _OFFSET_ACCEL_REGISTER = const(0x55)
 _OFFSET_MAGNET_REGISTER = const(0x5B)
@@ -146,6 +185,9 @@ class BNO055:
         self._write_register(_POWER_REGISTER, _POWER_NORMAL)
         self._write_register(_PAGE_REGISTER, 0x00)
         self._write_register(_TRIGGER_REGISTER, 0x00)
+        self.accel_range = ACCEL_4G
+        self.gyro_range = GYRO_2000_DPS
+        self.magnet_rate = MAGNET_20HZ
         time.sleep(0.01)
         self.mode = NDOF_MODE
         time.sleep(0.01)
@@ -347,14 +389,174 @@ class BNO055:
     def _gravity(self):
         raise NotImplementedError("Must be implemented.")
 
-    def accel_config(self, rng=ACC_4G, bandwidth=ACC_62_5HZ, acc_mode=ACC_NORMAL_MODE):
-        """Allows you to set the settings for the accelerometer"""
-        if self.mode not in [0x08, 0x09, 0x0A, 0x0B, 0x0C]:
-            self._write_register(_ACC_CONFIG_REGISTER, acc_mode | bandwidth | rng)
-            time.sleep(0.1)
-            value = self._read_register(_ACC_CONFIG_REGISTER)
-            return value
-        raise RuntimeError("Mode must not be a fusion mode")
+    @property
+    def accel_range(self):
+        """ Switch the accelerometer range and return the new range. Default value: +/- 4g
+        See table 3-8 in the datasheet.
+        """
+        self._write_register(_PAGE_REGISTER, 0x01)
+        value = self._read_register(_ACCEL_CONFIG_REGISTER)
+        self._write_register(_PAGE_REGISTER, 0x00)
+        return bin(0b00000011 & value)
+
+    @accel_range.setter
+    def accel_range(self, rng=ACCEL_4G):
+        self._write_register(_PAGE_REGISTER, 0x01)
+        value = self._read_register(_ACCEL_CONFIG_REGISTER)
+        masked_value = 0b11111100 & value
+        self._write_register(_ACCEL_CONFIG_REGISTER, masked_value | rng)
+
+    @property
+    def accel_bandwidth(self):
+        """ Switch the accelerometer bandwidth and return the new bandwidth. Default value: 62.5 Hz
+        See table 3-8 in the datasheet.
+        """
+        self._write_register(_PAGE_REGISTER, 0x01)
+        value = self._read_register(_ACCEL_CONFIG_REGISTER)
+        self._write_register(_PAGE_REGISTER, 0x00)
+        return bin(0b00011100 & value)
+
+    @accel_bandwidth.setter
+    def accel_bandwidth(self, bandwidth=ACCEL_62_5HZ):
+        if self.mode in [0x08, 0x09, 0x0A, 0x0B, 0x0C]:
+            raise RuntimeError("Mode must not be a fusion mode")
+        self._write_register(_PAGE_REGISTER, 0x01)
+        value = self._read_register(_ACCEL_CONFIG_REGISTER)
+        masked_value = 0b11100011 & value
+        self._write_register(_ACCEL_CONFIG_REGISTER, masked_value | bandwidth)
+
+    @property
+    def accel_mode(self):
+        """ Switch the accelerometer mode and return the new mode. Default value: Normal
+        See table 3-8 in the datasheet.
+        """
+        self._write_register(_PAGE_REGISTER, 0x01)
+        value = self._read_register(_ACCEL_CONFIG_REGISTER)
+        self._write_register(_PAGE_REGISTER, 0x00)
+        return bin(0b11100000 & value)
+
+    @accel_mode.setter
+    def accel_mode(self, mode=ACCEL_NORMAL_MODE):
+        if self.mode in [0x08, 0x09, 0x0A, 0x0B, 0x0C]:
+            raise RuntimeError("Mode must not be a fusion mode")
+        self._write_register(_PAGE_REGISTER, 0x01)
+        value = self._read_register(_ACCEL_CONFIG_REGISTER)
+        masked_value = 0b00011111 & value
+        self._write_register(_ACCEL_CONFIG_REGISTER, masked_value | mode)
+
+    @property
+    def gyro_range(self):
+        """ Switch the gyroscope range and return the new range. Default value: 2000 dps
+        See table 3-9 in the datasheet.
+        """
+        self._write_register(_PAGE_REGISTER, 0x01)
+        value = self._read_register(_GYRO_CONFIG_0_REGISTER)
+        self._write_register(_PAGE_REGISTER, 0x00)
+        return bin(0b00000111 & value)
+
+    @gyro_range.setter
+    def gyro_range(self, rng=GYRO_2000_DPS):
+        if self.mode in [0x08, 0x09, 0x0A, 0x0B, 0x0C]:
+            raise RuntimeError("Mode must not be a fusion mode")
+        self._write_register(_PAGE_REGISTER, 0x01)
+        value = self._read_register(_GYRO_CONFIG_0_REGISTER)
+        masked_value = 0b00111000 & value
+        self._write_register(_GYRO_CONFIG_0_REGISTER, masked_value | rng)
+
+    @property
+    def gyro_bandwidth(self):
+        """ Switch the gyroscope bandwidth and return the new bandwidth. Default value: 32 Hz
+        See table 3-9 in the datasheet.
+        """
+        self._write_register(_PAGE_REGISTER, 0x01)
+        value = self._read_register(_GYRO_CONFIG_0_REGISTER)
+        self._write_register(_PAGE_REGISTER, 0x00)
+        return bin(0b00111000 & value)
+
+    @gyro_bandwidth.setter
+    def gyro_bandwidth(self, bandwidth=GYRO_32HZ):
+        if self.mode in [0x08, 0x09, 0x0A, 0x0B, 0x0C]:
+            raise RuntimeError("Mode must not be a fusion mode")
+        self._write_register(_PAGE_REGISTER, 0x01)
+        value = self._read_register(_GYRO_CONFIG_0_REGISTER)
+        masked_value = 0b00000111 & value
+        self._write_register(_GYRO_CONFIG_0_REGISTER, masked_value | bandwidth)
+
+    @property
+    def gyro_mode(self):
+        """ Switch the gyroscope mode and return the new mode. Default value: Normal
+        See table 3-9 in the datasheet.
+        """
+        self._write_register(_PAGE_REGISTER, 0x01)
+        value = self._read_register(_GYRO_CONFIG_1_REGISTER)
+        self._write_register(_PAGE_REGISTER, 0x00)
+        return bin(0b00000111 & value)
+
+    @gyro_mode.setter
+    def gyro_mode(self, mode=GYRO_NORMAL_MODE):
+        if self.mode in [0x08, 0x09, 0x0A, 0x0B, 0x0C]:
+            raise RuntimeError("Mode must not be a fusion mode")
+        self._write_register(_PAGE_REGISTER, 0x01)
+        value = self._read_register(_GYRO_CONFIG_1_REGISTER)
+        masked_value = 0b00000000 & value
+        self._write_register(_GYRO_CONFIG_1_REGISTER, masked_value | mode)
+
+    @property
+    def magnet_rate(self):
+        """ Switch the magnetometer data output rate and return the new rate. Default value: 20Hz
+        See table 3-10 in the datasheet.
+        """
+        self._write_register(_PAGE_REGISTER, 0x01)
+        value = self._read_register(_MAGNET_CONFIG_REGISTER)
+        self._write_register(_PAGE_REGISTER, 0x00)
+        return bin(0b00000111 & value)
+
+    @magnet_rate.setter
+    def magnet_rate(self, rate=MAGNET_20HZ):
+        if self.mode in [0x08, 0x09, 0x0A, 0x0B, 0x0C]:
+            raise RuntimeError("Mode must not be a fusion mode")
+        self._write_register(_PAGE_REGISTER, 0x01)
+        value = self._read_register(_MAGNET_CONFIG_REGISTER)
+        masked_value = 0b01111000 & value
+        self._write_register(_MAGNET_CONFIG_REGISTER, masked_value | rate)
+
+    @property
+    def magnet_operation_mode(self):
+        """ Switch the magnetometer operation mode and return the new mode. Default value: Regular
+        See table 3-10 in the datasheet.
+        """
+        self._write_register(_PAGE_REGISTER, 0x01)
+        value = self._read_register(_MAGNET_CONFIG_REGISTER)
+        self._write_register(_PAGE_REGISTER, 0x00)
+        return bin(0b00011000 & value)
+
+    @magnet_operation_mode.setter
+    def magnet_operation_mode(self, mode=MAGNET_REGULAR_MODE):
+        if self.mode in [0x08, 0x09, 0x0A, 0x0B, 0x0C]:
+            raise RuntimeError("Mode must not be a fusion mode")
+        self._write_register(_PAGE_REGISTER, 0x01)
+        value = self._read_register(_MAGNET_CONFIG_REGISTER)
+        masked_value = 0b01100111 & value
+        self._write_register(_MAGNET_CONFIG_REGISTER, masked_value | mode)
+
+    @property
+    def magnet_power_mode(self):
+        """ Switch the magnetometer power mode and return the new mode. Default value: Forced
+        See table 3-10 in the datasheet.
+        """
+        self._write_register(_PAGE_REGISTER, 0x01)
+        value = self._read_register(_MAGNET_CONFIG_REGISTER)
+        self._write_register(_PAGE_REGISTER, 0x00)
+        return bin(0b01100000 & value)
+
+    @magnet_power_mode.setter
+    def magnet_power_mode(self, mode=MAGNET_FORCEMODE_MODE):
+        if self.mode in [0x08, 0x09, 0x0A, 0x0B, 0x0C]:
+            raise RuntimeError("Mode must not be a fusion mode")
+        self._write_register(_PAGE_REGISTER, 0x01)
+        value = self._read_register(_MAGNET_CONFIG_REGISTER)
+        masked_value = 0b00011111 & value
+        self._write_register(_MAGNET_CONFIG_REGISTER, masked_value | mode)
 
     def _write_register(self, register, value):
         raise NotImplementedError("Must be implemented.")
