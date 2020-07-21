@@ -405,6 +405,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
         value = self._read_register(_ACCEL_CONFIG_REGISTER)
         masked_value = 0b11111100 & value
         self._write_register(_ACCEL_CONFIG_REGISTER, masked_value | rng)
+        self._write_register(_PAGE_REGISTER, 0x00)
 
     @property
     def accel_bandwidth(self):
@@ -424,6 +425,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
         value = self._read_register(_ACCEL_CONFIG_REGISTER)
         masked_value = 0b11100011 & value
         self._write_register(_ACCEL_CONFIG_REGISTER, masked_value | bandwidth)
+        self._write_register(_PAGE_REGISTER, 0x00)
 
     @property
     def accel_mode(self):
@@ -443,6 +445,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
         value = self._read_register(_ACCEL_CONFIG_REGISTER)
         masked_value = 0b00011111 & value
         self._write_register(_ACCEL_CONFIG_REGISTER, masked_value | mode)
+        self._write_register(_PAGE_REGISTER, 0x00)
 
     @property
     def gyro_range(self):
@@ -462,6 +465,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
         value = self._read_register(_GYRO_CONFIG_0_REGISTER)
         masked_value = 0b00111000 & value
         self._write_register(_GYRO_CONFIG_0_REGISTER, masked_value | rng)
+        self._write_register(_PAGE_REGISTER, 0x00)
 
     @property
     def gyro_bandwidth(self):
@@ -481,6 +485,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
         value = self._read_register(_GYRO_CONFIG_0_REGISTER)
         masked_value = 0b00000111 & value
         self._write_register(_GYRO_CONFIG_0_REGISTER, masked_value | bandwidth)
+        self._write_register(_PAGE_REGISTER, 0x00)
 
     @property
     def gyro_mode(self):
@@ -500,6 +505,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
         value = self._read_register(_GYRO_CONFIG_1_REGISTER)
         masked_value = 0b00000000 & value
         self._write_register(_GYRO_CONFIG_1_REGISTER, masked_value | mode)
+        self._write_register(_PAGE_REGISTER, 0x00)
 
     @property
     def magnet_rate(self):
@@ -519,6 +525,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
         value = self._read_register(_MAGNET_CONFIG_REGISTER)
         masked_value = 0b01111000 & value
         self._write_register(_MAGNET_CONFIG_REGISTER, masked_value | rate)
+        self._write_register(_PAGE_REGISTER, 0x00)
 
     @property
     def magnet_operation_mode(self):
@@ -538,6 +545,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
         value = self._read_register(_MAGNET_CONFIG_REGISTER)
         masked_value = 0b01100111 & value
         self._write_register(_MAGNET_CONFIG_REGISTER, masked_value | mode)
+        self._write_register(_PAGE_REGISTER, 0x00)
 
     @property
     def magnet_power_mode(self):
@@ -557,6 +565,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
         value = self._read_register(_MAGNET_CONFIG_REGISTER)
         masked_value = 0b00011111 & value
         self._write_register(_MAGNET_CONFIG_REGISTER, masked_value | mode)
+        self._write_register(_PAGE_REGISTER, 0x00)
 
     def _write_register(self, register, value):
         raise NotImplementedError("Must be implemented.")
