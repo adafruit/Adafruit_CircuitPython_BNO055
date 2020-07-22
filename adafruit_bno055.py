@@ -397,7 +397,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
         self._write_register(_PAGE_REGISTER, 0x01)
         value = self._read_register(_ACCEL_CONFIG_REGISTER)
         self._write_register(_PAGE_REGISTER, 0x00)
-        return bin(0b00000011 & value)
+        return 0b00000011 & value
 
     @accel_range.setter
     def accel_range(self, rng=ACCEL_4G):
@@ -415,7 +415,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
         self._write_register(_PAGE_REGISTER, 0x01)
         value = self._read_register(_ACCEL_CONFIG_REGISTER)
         self._write_register(_PAGE_REGISTER, 0x00)
-        return bin(0b00011100 & value)
+        return 0b00011100 & value
 
     @accel_bandwidth.setter
     def accel_bandwidth(self, bandwidth=ACCEL_62_5HZ):
@@ -435,7 +435,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
         self._write_register(_PAGE_REGISTER, 0x01)
         value = self._read_register(_ACCEL_CONFIG_REGISTER)
         self._write_register(_PAGE_REGISTER, 0x00)
-        return bin(0b11100000 & value)
+        return 0b11100000 & value
 
     @accel_mode.setter
     def accel_mode(self, mode=ACCEL_NORMAL_MODE):
@@ -455,7 +455,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
         self._write_register(_PAGE_REGISTER, 0x01)
         value = self._read_register(_GYRO_CONFIG_0_REGISTER)
         self._write_register(_PAGE_REGISTER, 0x00)
-        return bin(0b00000111 & value)
+        return 0b00000111 & value
 
     @gyro_range.setter
     def gyro_range(self, rng=GYRO_2000_DPS):
@@ -475,7 +475,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
         self._write_register(_PAGE_REGISTER, 0x01)
         value = self._read_register(_GYRO_CONFIG_0_REGISTER)
         self._write_register(_PAGE_REGISTER, 0x00)
-        return bin(0b00111000 & value)
+        return 0b00111000 & value
 
     @gyro_bandwidth.setter
     def gyro_bandwidth(self, bandwidth=GYRO_32HZ):
@@ -495,7 +495,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
         self._write_register(_PAGE_REGISTER, 0x01)
         value = self._read_register(_GYRO_CONFIG_1_REGISTER)
         self._write_register(_PAGE_REGISTER, 0x00)
-        return bin(0b00000111 & value)
+        return 0b00000111 & value
 
     @gyro_mode.setter
     def gyro_mode(self, mode=GYRO_NORMAL_MODE):
@@ -515,7 +515,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
         self._write_register(_PAGE_REGISTER, 0x01)
         value = self._read_register(_MAGNET_CONFIG_REGISTER)
         self._write_register(_PAGE_REGISTER, 0x00)
-        return bin(0b00000111 & value)
+        return 0b00000111 & value
 
     @magnet_rate.setter
     def magnet_rate(self, rate=MAGNET_20HZ):
@@ -535,7 +535,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
         self._write_register(_PAGE_REGISTER, 0x01)
         value = self._read_register(_MAGNET_CONFIG_REGISTER)
         self._write_register(_PAGE_REGISTER, 0x00)
-        return bin(0b00011000 & value)
+        return 0b00011000 & value
 
     @magnet_operation_mode.setter
     def magnet_operation_mode(self, mode=MAGNET_REGULAR_MODE):
@@ -555,7 +555,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
         self._write_register(_PAGE_REGISTER, 0x01)
         value = self._read_register(_MAGNET_CONFIG_REGISTER)
         self._write_register(_PAGE_REGISTER, 0x00)
-        return bin(0b01100000 & value)
+        return 0b01100000 & value
 
     @magnet_power_mode.setter
     def magnet_power_mode(self, mode=MAGNET_FORCEMODE_MODE):
