@@ -548,7 +548,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
         self._write_register(_PAGE_REGISTER, 0x00)
 
     @property
-    def magnet_power_mode(self):
+    def magnet_mode(self):
         """ Switch the magnetometer power mode and return the new mode. Default value: Forced
         See table 3-10 in the datasheet.
         """
@@ -557,8 +557,8 @@ class BNO055:  # pylint: disable=too-many-public-methods
         self._write_register(_PAGE_REGISTER, 0x00)
         return 0b01100000 & value
 
-    @magnet_power_mode.setter
-    def magnet_power_mode(self, mode=MAGNET_FORCEMODE_MODE):
+    @magnet_mode.setter
+    def magnet_mode(self, mode=MAGNET_FORCEMODE_MODE):
         if self.mode in [0x08, 0x09, 0x0A, 0x0B, 0x0C]:
             raise RuntimeError("Mode must not be a fusion mode")
         self._write_register(_PAGE_REGISTER, 0x01)
