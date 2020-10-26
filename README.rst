@@ -75,7 +75,7 @@ Once you have the I2C object, you can create the sensor object:
 
 .. code:: python
 
-    sensor = adafruit_bno055.BNO055(i2c)
+    sensor = adafruit_bno055.BNO055_I2C(i2c)
 
 
 And then you can start reading the measurements:
