@@ -134,11 +134,11 @@ _ID_REGISTER = const(0x00)
 
 class _ScaledReadOnlyStruct(Struct):  # pylint: disable=too-few-public-methods
     def __init__(self, register_address, struct_format, scale):
-        super(_ScaledReadOnlyStruct, self).__init__(register_address, struct_format)
+        super().__init__(register_address, struct_format)
         self.scale = scale
 
     def __get__(self, obj, objtype=None):
-        result = super(_ScaledReadOnlyStruct, self).__get__(obj, objtype)
+        result = super().__get__(obj, objtype)
         return tuple(self.scale * v for v in result)
 
     def __set__(self, obj, value):
