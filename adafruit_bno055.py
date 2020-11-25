@@ -157,7 +157,7 @@ class _ReadOnlyUnaryStruct(UnaryStruct):  # pylint: disable=too-few-public-metho
             if abs(result - self.last_val) == 128:
                 result = super().__get__(obj, objtype)
                 if abs(result - self.last_val) == 128:
-                    return 0b01111111 & result
+                    return 0b00111111 & result
             self.last_val = result
         return result
 
