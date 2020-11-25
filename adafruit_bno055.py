@@ -33,10 +33,10 @@ inertial measurement unit module with sensor fusion.
 import time
 import struct
 
+from os import uname
 from micropython import const
 from adafruit_bus_device.i2c_device import I2CDevice
-from adafruit_register.i2c_struct import Struct, UnaryStruct, ROUnaryStruct
-from os import uname
+from adafruit_register.i2c_struct import Struct, UnaryStruct
 
 __version__ = "0.0.0-auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_BNO055.git"
@@ -132,6 +132,7 @@ _TRIGGER_REGISTER = const(0x3F)
 _POWER_REGISTER = const(0x3E)
 _ID_REGISTER = const(0x00)
 
+
 class _ScaledReadOnlyStruct(Struct):  # pylint: disable=too-few-public-methods
     def __init__(self, register_address, struct_format, scale):
         super().__init__(register_address, struct_format)
@@ -145,21 +146,21 @@ class _ScaledReadOnlyStruct(Struct):  # pylint: disable=too-few-public-methods
         raise NotImplementedError()
 
 
-class _ReadOnlyUnaryStruct(ROUnaryStruct):  # pylint: disable=too-few-public-methods
+class _ReadOnlyUnaryStruct(UnaryStruct):  # pylint: disable=too-few-public-methods
     def __init__(self, register_address, struct_format):
         super().__init__(register_address, struct_format)
         self.last_val = 0xFFFF
 
     def __get__(self, obj, objtype=None):
         result = super().__get__(obj, objtype)
-        if uname().sysname == 'Linux':
+        if uname().sysname == "Linux":
             if abs(result - self.last_val) == 128:
                 result = super().__get__(obj, objtype)
                 if abs(result - self.last_val) == 128:
                     return 0b01111111 & result
             self.last_val = result
         return result
-         
+
     def __set__(self, obj, value):
         raise NotImplementedError()
 
@@ -470,7 +471,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
 
     @property
     def accel_range(self):
-        """ Switch the accelerometer range and return the new range. Default value: +/- 4g
+        """Switch the accelerometer range and return the new range. Default value: +/- 4g
         See table 3-8 in the datasheet.
         """
         self._write_register(_PAGE_REGISTER, 0x01)
@@ -488,7 +489,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
 
     @property
     def accel_bandwidth(self):
-        """ Switch the accelerometer bandwidth and return the new bandwidth. Default value: 62.5 Hz
+        """Switch the accelerometer bandwidth and return the new bandwidth. Default value: 62.5 Hz
         See table 3-8 in the datasheet.
         """
         self._write_register(_PAGE_REGISTER, 0x01)
@@ -508,7 +509,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
 
     @property
     def accel_mode(self):
-        """ Switch the accelerometer mode and return the new mode. Default value: Normal
+        """Switch the accelerometer mode and return the new mode. Default value: Normal
         See table 3-8 in the datasheet.
         """
         self._write_register(_PAGE_REGISTER, 0x01)
@@ -528,7 +529,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
 
     @property
     def gyro_range(self):
-        """ Switch the gyroscope range and return the new range. Default value: 2000 dps
+        """Switch the gyroscope range and return the new range. Default value: 2000 dps
         See table 3-9 in the datasheet.
         """
         self._write_register(_PAGE_REGISTER, 0x01)
@@ -548,7 +549,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
 
     @property
     def gyro_bandwidth(self):
-        """ Switch the gyroscope bandwidth and return the new bandwidth. Default value: 32 Hz
+        """Switch the gyroscope bandwidth and return the new bandwidth. Default value: 32 Hz
         See table 3-9 in the datasheet.
         """
         self._write_register(_PAGE_REGISTER, 0x01)
@@ -568,7 +569,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
 
     @property
     def gyro_mode(self):
-        """ Switch the gyroscope mode and return the new mode. Default value: Normal
+        """Switch the gyroscope mode and return the new mode. Default value: Normal
         See table 3-9 in the datasheet.
         """
         self._write_register(_PAGE_REGISTER, 0x01)
@@ -588,7 +589,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
 
     @property
     def magnet_rate(self):
-        """ Switch the magnetometer data output rate and return the new rate. Default value: 20Hz
+        """Switch the magnetometer data output rate and return the new rate. Default value: 20Hz
         See table 3-10 in the datasheet.
         """
         self._write_register(_PAGE_REGISTER, 0x01)
@@ -608,7 +609,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
 
     @property
     def magnet_operation_mode(self):
-        """ Switch the magnetometer operation mode and return the new mode. Default value: Regular
+        """Switch the magnetometer operation mode and return the new mode. Default value: Regular
         See table 3-10 in the datasheet.
         """
         self._write_register(_PAGE_REGISTER, 0x01)
@@ -628,7 +629,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
 
     @property
     def magnet_mode(self):
-        """ Switch the magnetometer power mode and return the new mode. Default value: Forced
+        """Switch the magnetometer power mode and return the new mode. Default value: Forced
         See table 3-10 in the datasheet.
         """
         self._write_register(_PAGE_REGISTER, 0x01)
