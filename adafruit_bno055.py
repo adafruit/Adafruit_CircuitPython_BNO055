@@ -456,7 +456,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
 
     @property
     def accel_range(self):
-        """ Switch the accelerometer range and return the new range. Default value: +/- 4g
+        """Switch the accelerometer range and return the new range. Default value: +/- 4g
         See table 3-8 in the datasheet.
         """
         self._write_register(_PAGE_REGISTER, 0x01)
@@ -474,7 +474,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
 
     @property
     def accel_bandwidth(self):
-        """ Switch the accelerometer bandwidth and return the new bandwidth. Default value: 62.5 Hz
+        """Switch the accelerometer bandwidth and return the new bandwidth. Default value: 62.5 Hz
         See table 3-8 in the datasheet.
         """
         self._write_register(_PAGE_REGISTER, 0x01)
@@ -494,7 +494,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
 
     @property
     def accel_mode(self):
-        """ Switch the accelerometer mode and return the new mode. Default value: Normal
+        """Switch the accelerometer mode and return the new mode. Default value: Normal
         See table 3-8 in the datasheet.
         """
         self._write_register(_PAGE_REGISTER, 0x01)
@@ -514,7 +514,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
 
     @property
     def gyro_range(self):
-        """ Switch the gyroscope range and return the new range. Default value: 2000 dps
+        """Switch the gyroscope range and return the new range. Default value: 2000 dps
         See table 3-9 in the datasheet.
         """
         self._write_register(_PAGE_REGISTER, 0x01)
@@ -534,7 +534,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
 
     @property
     def gyro_bandwidth(self):
-        """ Switch the gyroscope bandwidth and return the new bandwidth. Default value: 32 Hz
+        """Switch the gyroscope bandwidth and return the new bandwidth. Default value: 32 Hz
         See table 3-9 in the datasheet.
         """
         self._write_register(_PAGE_REGISTER, 0x01)
@@ -554,7 +554,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
 
     @property
     def gyro_mode(self):
-        """ Switch the gyroscope mode and return the new mode. Default value: Normal
+        """Switch the gyroscope mode and return the new mode. Default value: Normal
         See table 3-9 in the datasheet.
         """
         self._write_register(_PAGE_REGISTER, 0x01)
@@ -574,7 +574,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
 
     @property
     def magnet_rate(self):
-        """ Switch the magnetometer data output rate and return the new rate. Default value: 20Hz
+        """Switch the magnetometer data output rate and return the new rate. Default value: 20Hz
         See table 3-10 in the datasheet.
         """
         self._write_register(_PAGE_REGISTER, 0x01)
@@ -594,7 +594,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
 
     @property
     def magnet_operation_mode(self):
-        """ Switch the magnetometer operation mode and return the new mode. Default value: Regular
+        """Switch the magnetometer operation mode and return the new mode. Default value: Regular
         See table 3-10 in the datasheet.
         """
         self._write_register(_PAGE_REGISTER, 0x01)
@@ -614,7 +614,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
 
     @property
     def magnet_mode(self):
-        """ Switch the magnetometer power mode and return the new mode. Default value: Forced
+        """Switch the magnetometer power mode and return the new mode. Default value: Forced
         See table 3-10 in the datasheet.
         """
         self._write_register(_PAGE_REGISTER, 0x01)
