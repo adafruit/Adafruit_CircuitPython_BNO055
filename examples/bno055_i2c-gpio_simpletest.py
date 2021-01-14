@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2021 ladyada for Adafruit Industries
+# SPDX-License-Identifier: MIT
+
 """
 This example demonstrates how to instantiate the
 Adafruit BNO055 Sensor using this library and just
