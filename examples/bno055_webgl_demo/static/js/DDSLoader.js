@@ -166,9 +166,9 @@ THREE.DDSLoader.parse = function ( buffer, loadMipmaps ) {
 
 		default:
 
-			if ( header[off_RGBBitCount] == 32 
+			if ( header[off_RGBBitCount] == 32
 				&& header[off_RBitMask]&0xff0000
-				&& header[off_GBitMask]&0xff00 
+				&& header[off_GBitMask]&0xff00
 				&& header[off_BBitMask]&0xff
 				&& header[off_ABitMask]&0xff000000  ) {
 				isRGBAUncompressed = true;
@@ -215,7 +215,7 @@ THREE.DDSLoader.parse = function ( buffer, loadMipmaps ) {
 				var dataLength = Math.max( 4, width ) / 4 * Math.max( 4, height ) / 4 * blockBytes;
 				var byteArray = new Uint8Array( buffer, dataOffset, dataLength );
 			}
-			
+
 			var mipmap = { "data": byteArray, "width": width, "height": height };
 			dds.mipmaps.push( mipmap );
 
@@ -234,4 +234,3 @@ THREE.DDSLoader.parse = function ( buffer, loadMipmaps ) {
 	return dds;
 
 };
-
