@@ -362,7 +362,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
         """Gives the raw magnetometer readings in microteslas.
         Returns an empty tuple of length 3 when this property has been disabled by the current mode.
         """
-        if self.mode not in [0x00, 0x03, 0x05, 0x08]:
+        if self.mode not in [0x00, 0X01, 0x03, 0x05, 0x08]:
             return self._magnetic
         return (None, None, None)
 
@@ -388,7 +388,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
         """Gives the calculated orientation angles, in degrees.
         Returns an empty tuple of length 3 when this property has been disabled by the current mode.
         """
-        if self.mode in [0x09, 0x0B, 0x0C]:
+        if self.mode in [0x09, 0x0B, 0x0C, 0x08, 0x0A]:
             return self._euler
         return (None, None, None)
 
@@ -401,7 +401,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
         """Gives the calculated orientation as a quaternion.
         Returns an empty tuple of length 3 when this property has been disabled by the current mode.
         """
-        if self.mode in [0x09, 0x0B, 0x0C]:
+        if self.mode in [0x09, 0x0B, 0x0C, 0x08, 0x0A]:
             return self._quaternion
         return (None, None, None, None)
 
