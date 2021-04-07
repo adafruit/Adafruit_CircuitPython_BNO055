@@ -186,37 +186,38 @@ class BNO055:  # pylint: disable=too-many-public-methods
     @property
     def mode(self):
         """
-        legend: x=on, -=off
+        legend: x=on, -=off (see Table 3-3 in datasheet)
 
-        +------------------+-------+---------+------+----------+
-        | Mode             | Accel | Compass | Gyro | Absolute |
-        +==================+=======+=========+======+==========+
-        | CONFIG_MODE      |   -   |   -     |  -   |     -    |
-        +------------------+-------+---------+------+----------+
-        | ACCONLY_MODE     |   X   |   -     |  -   |     -    |
-        +------------------+-------+---------+------+----------+
-        | MAGONLY_MODE     |   -   |   X     |  -   |     -    |
-        +------------------+-------+---------+------+----------+
-        | GYRONLY_MODE     |   -   |   -     |  X   |     -    |
-        +------------------+-------+---------+------+----------+
-        | ACCMAG_MODE      |   X   |   X     |  -   |     -    |
-        +------------------+-------+---------+------+----------+
-        | ACCGYRO_MODE     |   X   |   -     |  X   |     -    |
-        +------------------+-------+---------+------+----------+
-        | MAGGYRO_MODE     |   -   |   X     |  X   |     -    |
-        +------------------+-------+---------+------+----------+
-        | AMG_MODE         |   X   |   X     |  X   |     -    |
-        +------------------+-------+---------+------+----------+
-        | IMUPLUS_MODE     |   X   |   -     |  X   |     -    |
-        +------------------+-------+---------+------+----------+
-        | COMPASS_MODE     |   X   |   X     |  -   |     X    |
-        +------------------+-------+---------+------+----------+
-        | M4G_MODE         |   X   |   X     |  -   |     -    |
-        +------------------+-------+---------+------+----------+
-        | NDOF_FMC_OFF_MODE|   X   |   X     |  X   |     X    |
-        +------------------+-------+---------+------+----------+
-        | NDOF_MODE        |   X   |   X     |  X   |     X    |
-        +------------------+-------+---------+------+----------+
+        +------------------+-------+---------+------+----------+----------+
+        | Mode             | Accel | Compass | Gyro | Fusion   | Fusion   |
+        |                  |       | (Mag)   |      | Absolute | Relative |
+        +==================+=======+=========+======+==========+==========+
+        | CONFIG_MODE      |   -   |   -     |  -   |     -    |     -    |
+        +------------------+-------+---------+------+----------+----------+
+        | ACCONLY_MODE     |   X   |   -     |  -   |     -    |     -    |
+        +------------------+-------+---------+------+----------+----------+
+        | MAGONLY_MODE     |   -   |   X     |  -   |     -    |     -    |
+        +------------------+-------+---------+------+----------+----------+
+        | GYRONLY_MODE     |   -   |   -     |  X   |     -    |     -    |
+        +------------------+-------+---------+------+----------+----------+
+        | ACCMAG_MODE      |   X   |   X     |  -   |     -    |     -    |
+        +------------------+-------+---------+------+----------+----------+
+        | ACCGYRO_MODE     |   X   |   -     |  X   |     -    |     -    |
+        +------------------+-------+---------+------+----------+----------+
+        | MAGGYRO_MODE     |   -   |   X     |  X   |     -    |     -    |
+        +------------------+-------+---------+------+----------+----------+
+        | AMG_MODE         |   X   |   X     |  X   |     -    |     -    |
+        +------------------+-------+---------+------+----------+----------+
+        | IMUPLUS_MODE     |   X   |   -     |  X   |     -    |     X    |
+        +------------------+-------+---------+------+----------+----------+
+        | COMPASS_MODE     |   X   |   X     |  -   |     X    |     -    |
+        +------------------+-------+---------+------+----------+----------+
+        | M4G_MODE         |   X   |   X     |  -   |     -    |     X    |
+        +------------------+-------+---------+------+----------+----------+
+        | NDOF_FMC_OFF_MODE|   X   |   X     |  X   |     X    |     -    |
+        +------------------+-------+---------+------+----------+----------+
+        | NDOF_MODE        |   X   |   X     |  X   |     X    |     -    |
+        +------------------+-------+---------+------+----------+----------+
 
         The default mode is ``NDOF_MODE``.
 
@@ -362,7 +363,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
         """Gives the raw magnetometer readings in microteslas.
         Returns an empty tuple of length 3 when this property has been disabled by the current mode.
         """
-        if self.mode not in [0x00, 0x03, 0x05, 0x08]:
+        if self.mode not in [0x00, 0x01, 0x03, 0x05, 0x08]:
             return self._magnetic
         return (None, None, None)
 
@@ -388,7 +389,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
         """Gives the calculated orientation angles, in degrees.
         Returns an empty tuple of length 3 when this property has been disabled by the current mode.
         """
-        if self.mode in [0x09, 0x0B, 0x0C]:
+        if self.mode in [0x08, 0x09, 0x0A, 0x0B, 0x0C]:
             return self._euler
         return (None, None, None)
 
@@ -401,7 +402,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
         """Gives the calculated orientation as a quaternion.
         Returns an empty tuple of length 3 when this property has been disabled by the current mode.
         """
-        if self.mode in [0x09, 0x0B, 0x0C]:
+        if self.mode in [0x08, 0x09, 0x0A, 0x0B, 0x0C]:
             return self._quaternion
         return (None, None, None, None)
 
@@ -414,7 +415,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
         """Returns the linear acceleration, without gravity, in m/s.
         Returns an empty tuple of length 3 when this property has been disabled by the current mode.
         """
-        if self.mode in [0x09, 0x0B, 0x0C]:
+        if self.mode in [0x08, 0x09, 0x0A, 0x0B, 0x0C]:
             return self._linear_acceleration
         return (None, None, None)
 
@@ -427,7 +428,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
         """Returns the gravity vector, without acceleration in m/s.
         Returns an empty tuple of length 3 when this property has been disabled by the current mode.
         """
-        if self.mode in [0x09, 0x0B, 0x0C]:
+        if self.mode in [0x08, 0x09, 0x0A, 0x0B, 0x0C]:
             return self._gravity
         return (None, None, None)
 
@@ -713,37 +714,37 @@ class BNO055_UART(BNO055):
     @property
     def _acceleration(self):
         resp = struct.unpack("<hhh", self._read_register(0x08, 6))
-        return tuple([x / 100 for x in resp])
+        return tuple(x / 100 for x in resp)
 
     @property
     def _magnetic(self):
         resp = struct.unpack("<hhh", self._read_register(0x0E, 6))
-        return tuple([x / 16 for x in resp])
+        return tuple(x / 16 for x in resp)
 
     @property
     def _gyro(self):
         resp = struct.unpack("<hhh", self._read_register(0x14, 6))
-        return tuple([x * 0.001090830782496456 for x in resp])
+        return tuple(x * 0.001090830782496456 for x in resp)
 
     @property
     def _euler(self):
         resp = struct.unpack("<hhh", self._read_register(0x1A, 6))
-        return tuple([x / 16 for x in resp])
+        return tuple(x / 16 for x in resp)
 
     @property
     def _quaternion(self):
         resp = struct.unpack("<hhhh", self._read_register(0x20, 8))
-        return tuple([x / (1 << 14) for x in resp])
+        return tuple(x / (1 << 14) for x in resp)
 
     @property
     def _linear_acceleration(self):
         resp = struct.unpack("<hhh", self._read_register(0x28, 6))
-        return tuple([x / 100 for x in resp])
+        return tuple(x / 100 for x in resp)
 
     @property
     def _gravity(self):
         resp = struct.unpack("<hhh", self._read_register(0x2E, 6))
-        return tuple([x / 100 for x in resp])
+        return tuple(x / 100 for x in resp)
 
     @property
     def offsets_accelerometer(self):
