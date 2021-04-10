@@ -111,10 +111,9 @@ _RADIUS_MAGNET_REGISTER = const(0x69)
 _TRIGGER_REGISTER = const(0x3F)
 _POWER_REGISTER = const(0x3E)
 _ID_REGISTER = const(0x00)
-# Axis remap registers
+# Axis remap registers and values
 _AXIS_MAP_CONFIG_REGISTER = const(0x41)
 _AXIS_MAP_SIGN_REGISTER = const(0x42)
-# Axis remap values
 AXIS_REMAP_X = const(0x00)
 AXIS_REMAP_Y = const(0x01)
 AXIS_REMAP_Z = const(0x02)
