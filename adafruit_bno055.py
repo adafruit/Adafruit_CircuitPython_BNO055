@@ -643,7 +643,8 @@ class BNO055:  # pylint: disable=too-many-public-methods
                          normal or negative/inverted.  The default is positive.)
           - Y axis sign (see above)
           - Z axis sign (see above)
-        Note that the default value, per the datasheet, is NOT P0, but rather P1 ()
+        Note that the default value, per the datasheet, is NOT P0,
+        but rather P1 ()
         """
         # Get the axis remap register value.
         map_config = self._read_register(_AXIS_MAP_CONFIG_REGISTER)
@@ -665,8 +666,8 @@ class BNO055:  # pylint: disable=too-many-public-methods
         Set axis remap for each axis.  The x, y, z parameter values should
         be set to one of AXIS_REMAP_X (0x00), AXIS_REMAP_Y (0x01), or
         AXIS_REMAP_Z (0x02) and will change the BNO's axis to represent another
-        axis.  Note that two axises cannot be mapped to the same axis, so the x,
-        y, z params should be a unique combination of AXIS_REMAP_X,
+        axis.  Note that two axises cannot be mapped to the same axis, so the
+        x, y, z params should be a unique combination of AXIS_REMAP_X,
         AXIS_REMAP_Y, AXIS_REMAP_Z values.
         The x_sign, y_sign, z_sign values represent if the axis should be
         positive or negative (inverted). See section 3.4 of the datasheet for
