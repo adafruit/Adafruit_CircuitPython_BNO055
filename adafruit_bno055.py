@@ -643,6 +643,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
                          normal or negative/inverted.  The default is positive.)
           - Y axis sign (see above)
           - Z axis sign (see above)
+
         Note that the default value, per the datasheet, is NOT P0,
         but rather P1 ()
         """
