@@ -660,7 +660,6 @@ class BNO055:  # pylint: disable=too-many-public-methods
 
     @axis_remap.setter
     def axis_remap(self, remap):
-        x, y, z, x_sign, y_sign, z_sign = remap
         """Pass a tuple coinsidting of x, y, z, x_sign, y-sign, and z_sign.
         Set axis remap for each axis.  The x, y, z parameter values should
         be set to one of AXIS_REMAP_X (0x00), AXIS_REMAP_Y (0x01), or
@@ -673,6 +672,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
         information on the proper settings for each possible orientation of
         the chip.
         """
+        x, y, z, x_sign, y_sign, z_sign = remap
         # Switch to configuration mode. Necessary to remap axes
         current_mode = self._read_register(_MODE_REGISTER)
         self.mode = CONFIG_MODE
