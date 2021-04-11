@@ -111,6 +111,14 @@ _RADIUS_MAGNET_REGISTER = const(0x69)
 _TRIGGER_REGISTER = const(0x3F)
 _POWER_REGISTER = const(0x3E)
 _ID_REGISTER = const(0x00)
+# Axis remap registers and values
+_AXIS_MAP_CONFIG_REGISTER = const(0x41)
+_AXIS_MAP_SIGN_REGISTER = const(0x42)
+AXIS_REMAP_X = const(0x00)
+AXIS_REMAP_Y = const(0x01)
+AXIS_REMAP_Z = const(0x02)
+AXIS_REMAP_POSITIVE = const(0x00)
+AXIS_REMAP_NEGATIVE = const(0x01)
 
 
 class _ScaledReadOnlyStruct(Struct):  # pylint: disable=too-few-public-methods
@@ -619,6 +627,69 @@ class BNO055:  # pylint: disable=too-many-public-methods
 
     def _read_register(self, register):
         raise NotImplementedError("Must be implemented.")
+
+    @property
+    def axis_remap(self):
+        """Return a tuple with the axis remap register values.
+        This will return 6 values with the following meaning:
+          - X axis remap (a value of AXIS_REMAP_X, AXIS_REMAP_Y, or AXIS_REMAP_Z.
+                          which indicates that the physical X axis of the chip
+                          is remapped to a different axis)
+          - Y axis remap (see above)
+          - Z axis remap (see above)
+          - X axis sign (a value of AXIS_REMAP_POSITIVE or AXIS_REMAP_NEGATIVE
+                         which indicates if the X axis values should be positive/
+                         normal or negative/inverted.  The default is positive.)
+          - Y axis sign (see above)
+          - Z axis sign (see above)
+        Note that the default value, per the datasheet, is NOT P0,
+        but rather P1 ()
+        """
+        # Get the axis remap register value.
+        map_config = self._read_register(_AXIS_MAP_CONFIG_REGISTER)
+        z = (map_config >> 4) & 0x03
+        y = (map_config >> 2) & 0x03
+        x = map_config & 0x03
+        # Get the axis remap sign register value.
+        sign_config = self._read_register(_AXIS_MAP_SIGN_REGISTER)
+        x_sign = (sign_config >> 2) & 0x01
+        y_sign = (sign_config >> 1) & 0x01
+        z_sign = sign_config & 0x01
+        # Return the results as a tuple of all 3 values.
+        return (x, y, z, x_sign, y_sign, z_sign)
+
+    @axis_remap.setter
+    def axis_remap(self, remap):
+        x, y, z, x_sign, y_sign, z_sign = remap
+        """Pass a tuple coinsidting of x, y, z, x_sign, y-sign, and z_sign.
+        Set axis remap for each axis.  The x, y, z parameter values should
+        be set to one of AXIS_REMAP_X (0x00), AXIS_REMAP_Y (0x01), or
+        AXIS_REMAP_Z (0x02) and will change the BNO's axis to represent another
+        axis.  Note that two axises cannot be mapped to the same axis, so the
+        x, y, z params should be a unique combination of AXIS_REMAP_X,
+        AXIS_REMAP_Y, AXIS_REMAP_Z values.
+        The x_sign, y_sign, z_sign values represent if the axis should be
+        positive or negative (inverted). See section 3.4 of the datasheet for
+        information on the proper settings for each possible orientation of
+        the chip.
+        """
+        # Switch to configuration mode. Necessary to remap axes
+        current_mode = self._read_register(_MODE_REGISTER)
+        self.mode = CONFIG_MODE
+        # Set the axis remap register value.
+        map_config = 0x00
+        map_config |= (z & 0x03) << 4
+        map_config |= (y & 0x03) << 2
+        map_config |= x & 0x03
+        self._write_register(_AXIS_MAP_CONFIG_REGISTER, map_config)
+        # Set the axis remap sign register value.
+        sign_config = 0x00
+        sign_config |= (x_sign & 0x01) << 2
+        sign_config |= (y_sign & 0x01) << 1
+        sign_config |= z_sign & 0x01
+        self._write_register(_AXIS_MAP_SIGN_REGISTER, sign_config)
+        # Go back to normal operation mode.
+        self._write_register(_MODE_REGISTER, current_mode)
 
 
 class BNO055_I2C(BNO055):
