@@ -631,6 +631,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
     @property
     def axis_remap(self):
         """Return a tuple with the axis remap register values.
+
         This will return 6 values with the following meaning:
           - X axis remap (a value of AXIS_REMAP_X, AXIS_REMAP_Y, or AXIS_REMAP_Z.
                           which indicates that the physical X axis of the chip
@@ -661,6 +662,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
     @axis_remap.setter
     def axis_remap(self, remap):
         """Pass a tuple coinsidting of x, y, z, x_sign, y-sign, and z_sign.
+
         Set axis remap for each axis.  The x, y, z parameter values should
         be set to one of AXIS_REMAP_X (0x00), AXIS_REMAP_Y (0x01), or
         AXIS_REMAP_Z (0x02) and will change the BNO's axis to represent another
