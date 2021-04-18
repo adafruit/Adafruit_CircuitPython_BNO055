@@ -299,7 +299,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
            is calculated from accelerometer, gyroscope and the magnetometer.
 
         """
-        return self._read_register(_MODE_REGISTER)
+        return ( self._read_register(_MODE_REGISTER) & 0x00001111 ) # Datasheet Table 4-2
 
     @mode.setter
     def mode(self, new_mode):
