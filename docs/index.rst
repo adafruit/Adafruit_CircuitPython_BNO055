@@ -23,10 +23,12 @@ Table of Contents
 .. toctree::
     :caption: Tutorials
 
+    Adafruit 9-DOF Absolute Orientation IMU Fusion Breakout - BNO055 Learning Guide <https://learn.adafruit.com/adafruit-bno055-absolute-orientation-sensor/overview>
+
 .. toctree::
     :caption: Related Products
 
-    Adafruit 9-DOF Absolute Orientation IMU Fusion Breakout - BNO055 <https://www.adafruit.com/product/2472>
+    Adafruit 9-DOF Absolute Orientation IMU Fusion Breakout - BNO055 <https://www.adafruit.com/product/4646>
 
 .. toctree::
     :caption: Other Links

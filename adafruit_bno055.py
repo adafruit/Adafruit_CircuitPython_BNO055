@@ -3,13 +3,30 @@
 # SPDX-License-Identifier: MIT
 
 """
-``adafruit_bno055`` - Adafruit 9-DOF Absolute Orientation IMU Fusion Breakout - BNO055
+`adafruit_bno055`
 =======================================================================================
 
 This is a CircuitPython driver for the Bosch BNO055 nine degree of freedom
 inertial measurement unit module with sensor fusion.
 
 * Author(s): Radomir Dopieralski
+
+
+**Hardware:**
+
+* Adafruit `9-DOF Absolute Orientation IMU Fusion Breakout - BNO055
+  <https://www.adafruit.com/product/4646>`_ (Product ID: 4646)
+
+
+**Software and Dependencies:**
+
+* Adafruit CircuitPython firmware for the supported boards:
+  https://circuitpython.org/downloads
+
+* Adafruit's Bus Device library: https://github.com/adafruit/Adafruit_CircuitPython_BusDevice
+
+* Adafruit's Register library: https://github.com/adafruit/Adafruit_CircuitPython_Register
+
 """
 import time
 import struct
@@ -164,6 +181,31 @@ class _ModeStruct(Struct):  # pylint: disable=too-few-public-methods
 class BNO055:  # pylint: disable=too-many-public-methods
     """
     Base class for the BNO055 9DOF IMU sensor.
+
+    **Quickstart: Importing and using the device**
+
+        Here is an example of using the :class:`BNO055` class.
+        First you will need to import the libraries to use the sensor
+
+        .. code-block:: python
+
+            import board
+            import adafruit_bno055
+
+        Once this is done you can define your `board.I2C` object and define your sensor object
+
+        .. code-block:: python
+
+            i2c = board.I2C()  # uses board.SCL and board.SDA
+            sensor = adafruit_bno055.BNO055_I2C(i2c)
+
+
+        Now you have access to the :attr:`acceleration` attribute among others
+
+        .. code-block:: python
+
+            sensor = accelerometer.acceleration
+
     """
 
     def __init__(self):
@@ -227,11 +269,11 @@ class BNO055:  # pylint: disable=too-many-public-methods
         | NDOF_MODE        |   X   |   X     |  X   |     X    |     -    |
         +------------------+-------+---------+------+----------+----------+
 
-        The default mode is ``NDOF_MODE``.
+        The default mode is :const:`NDOF_MODE`.
 
         | You can set the mode using the line below:
         | ``sensor.mode = adafruit_bno055.ACCONLY_MODE``
-        | replacing ``ACCONLY_MODE`` with the mode you want to use
+        | replacing :const:`ACCONLY_MODE` with the mode you want to use
 
         .. data:: CONFIG_MODE
 
@@ -662,7 +704,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
 
     @axis_remap.setter
     def axis_remap(self, remap):
-        """Pass a tuple coinsidting of x, y, z, x_sign, y-sign, and z_sign.
+        """Pass a tuple consisting of x, y, z, x_sign, y-sign, and z_sign.
 
         Set axis remap for each axis.  The x, y, z parameter values should
         be set to one of AXIS_REMAP_X (0x00), AXIS_REMAP_Y (0x01), or

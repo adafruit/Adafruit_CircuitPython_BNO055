@@ -3,15 +3,14 @@
 
 import time
 import board
-import busio
 import adafruit_bno055
 
-# Use these lines for I2C
-i2c = busio.I2C(board.SCL, board.SDA)
+
+i2c = board.I2C()
 sensor = adafruit_bno055.BNO055_I2C(i2c)
 
-# User these lines for UART
-# uart = busio.UART(board.TX, board.RX)
+# If you are going to use UART uncomment these lines
+# uart = board.UART()
 # sensor = adafruit_bno055.BNO055_UART(uart)
 
 last_val = 0xFFFF
