@@ -40,7 +40,7 @@ __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_BNO055.git"
 
 _CHIP_ID = const(0xA0)
 
-CONFIG_MODE = const(0x00)
+CONFIG_MODE =  const(0x00)
 ACCONLY_MODE = const(0x01)
 MAGONLY_MODE = const(0x02)
 GYRONLY_MODE = const(0x03)
