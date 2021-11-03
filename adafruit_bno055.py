@@ -791,7 +791,7 @@ class BNO055_UART(BNO055):
         self._uart.baudrate = 115200
         super().__init__()
 
-    def _write_register(self, register, data):  # pylint: disable=arguments-differ
+    def _write_register(self, register, data):  # pylint: disable=arguments-differ,arguments-renamed
         if not isinstance(data, bytes):
             data = bytes([data])
         self._uart.write(bytes([0xAA, 0x00, register, len(data)]) + data)
