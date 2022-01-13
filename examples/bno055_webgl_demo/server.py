@@ -79,7 +79,7 @@ def read_bno():
             bno_data["quaternion"] = bno.quaternion
             bno_data["calibration"] = bno.calibration_status
             # Notify any waiting threads that the BNO state has been updated.
-            bno_changed.notifyAll()
+            bno_changed.notifyAll()  # pylint: disable=deprecated-method
         # Sleep until the next reading.
         time.sleep(1.0 / BNO_UPDATE_FREQUENCY_HZ)
 
