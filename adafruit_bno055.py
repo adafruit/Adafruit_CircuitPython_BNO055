@@ -213,7 +213,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
         if chip_id != _CHIP_ID:
             raise RuntimeError("bad chip id (%x != %x)" % (chip_id, _CHIP_ID))
         self._reset()
-        self._write_register(_POWER_REGISTER, _POWER_NORMAL)
+        self.set_normal_mode()
         self._write_register(_PAGE_REGISTER, 0x00)
         self._write_register(_TRIGGER_REGISTER, 0x00)
         self.accel_range = ACCEL_4G
@@ -735,6 +735,14 @@ class BNO055:  # pylint: disable=too-many-public-methods
         self._write_register(_AXIS_MAP_SIGN_REGISTER, sign_config)
         # Go back to normal operation mode.
         self._write_register(_MODE_REGISTER, current_mode)
+
+    def set_normal_mode(self):
+        """Sets the sensor to Normal power mode"""
+        self._write_register(_POWER_REGISTER, _POWER_NORMAL)
+
+    def set_suspend_mode(self):
+        """Sets the sensor to Suspend power mode"""
+        self._write_register(_POWER_REGISTER, _POWER_SUSPEND)
 
 
 class BNO055_I2C(BNO055):
