@@ -23,7 +23,7 @@ import flask
 from adafruit_extended_bus import ExtendedI2C as I2C
 import adafruit_bno055
 
-i2c = I2C(1) 
+i2c = I2C(1)
 
 # Create the BNO sensor connection.
 bno = adafruit_bno055.BNO055_I2C(i2c)
