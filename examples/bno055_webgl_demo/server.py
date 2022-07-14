@@ -12,14 +12,15 @@
 #
 # Author: Tony DiCola
 # 2019 update: Carter Nelson
+# 2022 update: vertigra
 
-from adafruit_extended_bus import ExtendedI2C as I2C
 import json
 import threading
 import time
 import flask
-
 import adafruit_bno055
+
+from adafruit_extended_bus import ExtendedI2C as I2C
 
 i2c = I2C(1) 
 
