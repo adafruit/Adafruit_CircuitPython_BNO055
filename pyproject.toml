@@ -12,7 +12,7 @@ requires = [
 [project]
 name = "adafruit-circuitpython-bno055"
 description = "CircuitPython library for BNO055 9-DOF absolute orientation sensor."
-version = "0.0.0-auto.0"
+version = "0.0.0+auto.0"
 readme = "README.rst"
 authors = [
     {name = "Adafruit Industries", email = "circuitpython@adafruit.com"}
