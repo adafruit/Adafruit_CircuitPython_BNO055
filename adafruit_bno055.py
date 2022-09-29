@@ -36,7 +36,7 @@ from adafruit_bus_device.i2c_device import I2CDevice
 from adafruit_register.i2c_struct import Struct, UnaryStruct
 
 try:
-    from typing import Optional, Tuple, Union
+    from typing import Optional, Tuple, Type, Union
     from busio import I2C, UART
 except ImportError:
     pass
@@ -221,7 +221,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
     def __init__(self) -> None:
         chip_id = self._read_register(_ID_REGISTER)
         if chip_id != _CHIP_ID:
-            raise RuntimeError("bad chip id (%x != %x)" % (chip_id, _CHIP_ID))
+            raise RuntimeError(f"bad chip id ({chip_id:#x} != {_CHIP_ID:#x})")
         self._reset()
         self.set_normal_mode()
         self._write_register(_PAGE_REGISTER, 0x00)
@@ -406,7 +406,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
         raise NotImplementedError("Must be implemented.")
 
     @property
-    def acceleration(self) -> Tuple[Optonal[float], Optional[float], Optional[float]]:
+    def acceleration(self) -> Tuple[Optional[float], Optional[float], Optional[float]]:
         """Gives the raw accelerometer readings, in m/s.
         Returns an empty tuple of length 3 when this property has been disabled by the current mode.
         """
@@ -419,7 +419,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
         raise NotImplementedError("Must be implemented.")
 
     @property
-    def magnetic(self) -> Tuple[Optonal[float], Optional[float], Optional[float]]:
+    def magnetic(self) -> Tuple[Optional[float], Optional[float], Optional[float]]:
         """Gives the raw magnetometer readings in microteslas.
         Returns an empty tuple of length 3 when this property has been disabled by the current mode.
         """
@@ -432,7 +432,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
         raise NotImplementedError("Must be implemented.")
 
     @property
-    def gyro(self) -> Tuple[Optonal[float], Optional[float], Optional[float]]:
+    def gyro(self) -> Tuple[Optional[float], Optional[float], Optional[float]]:
         """Gives the raw gyroscope reading in radians per second.
         Returns an empty tuple of length 3 when this property has been disabled by the current mode.
         """
@@ -445,7 +445,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
         raise NotImplementedError("Must be implemented.")
 
     @property
-    def euler(self) -> Tuple[Optonal[float], Optional[float], Optional[float]]:
+    def euler(self) -> Tuple[Optional[float], Optional[float], Optional[float]]:
         """Gives the calculated orientation angles, in degrees.
         Returns an empty tuple of length 3 when this property has been disabled by the current mode.
         """
@@ -458,7 +458,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
         raise NotImplementedError("Must be implemented.")
 
     @property
-    def quaternion(self) -> Tuple[Optonal[float], Optional[float], Optional[float]]:
+    def quaternion(self) -> Tuple[Optional[float], Optional[float], Optional[float]]:
         """Gives the calculated orientation as a quaternion.
         Returns an empty tuple of length 3 when this property has been disabled by the current mode.
         """
@@ -473,7 +473,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
     @property
     def linear_acceleration(
         self,
-    ) -> Tuple[Optonal[float], Optional[float], Optional[float]]:
+    ) -> Tuple[Optional[float], Optional[float], Optional[float]]:
         """Returns the linear acceleration, without gravity, in m/s.
         Returns an empty tuple of length 3 when this property has been disabled by the current mode.
         """
@@ -486,7 +486,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
         raise NotImplementedError("Must be implemented.")
 
     @property
-    def gravity(self) -> Tuple[Optonal[float], Optional[float], Optional[float]]:
+    def gravity(self) -> Tuple[Optional[float], Optional[float], Optional[float]]:
         """Returns the gravity vector, without acceleration in m/s.
         Returns an empty tuple of length 3 when this property has been disabled by the current mode.
         """
@@ -811,9 +811,9 @@ class BNO055_UART(BNO055):
         self._uart.baudrate = 115200
         super().__init__()
 
-    def _write_register(
+    def _write_register(  # pylint: disable=arguments-differ,arguments-renamed
         self, register: int, data: int
-    ) -> None:  # pylint: disable=arguments-differ,arguments-renamed
+    ) -> None:
         if not isinstance(data, bytes):
             data = bytes([data])
         self._uart.write(bytes([0xAA, 0x00, register, len(data)]) + data)
@@ -826,9 +826,9 @@ class BNO055_UART(BNO055):
         if resp[0] != 0xEE or resp[1] != 0x01:
             raise RuntimeError(f"UART write error: {resp[1]}")
 
-    def _read_register(
+    def _read_register(  # pylint: disable=arguments-differ
         self, register: int, length: int = 1
-    ) -> int:  # pylint: disable=arguments-differ
+    ) -> int:
         i = 0
         while i < 3:
             self._uart.write(bytes([0xAA, 0x01, register, length]))
