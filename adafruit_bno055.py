@@ -36,7 +36,7 @@ from adafruit_bus_device.i2c_device import I2CDevice
 from adafruit_register.i2c_struct import Struct, UnaryStruct
 
 try:
-    from typing import Optional, Tuple, Type, Union
+    from typing import Any, Optional, Tuple, Type, Union
     from busio import I2C, UART
 except ImportError:
     pass
@@ -149,16 +149,18 @@ class _ScaledReadOnlyStruct(Struct):  # pylint: disable=too-few-public-methods
         super().__init__(register_address, struct_format)
         self.scale = scale
 
-    def __get__(self, obj, objtype=None) -> Tuple[float, float, float]:
+    def __get__(
+        self, obj: Optional["BNO055_I2C"], objtype: Optional[Type["BNO055_I2C"]] = None
+    ) -> Tuple[float, float, float]:
         result = super().__get__(obj, objtype)
         return tuple(self.scale * v for v in result)
 
-    def __set__(self, obj, value) -> None:
+    def __set__(self, obj: Optional["BNO055_I2C"], value: Any) -> None:
         raise NotImplementedError()
 
 
 class _ReadOnlyUnaryStruct(UnaryStruct):  # pylint: disable=too-few-public-methods
-    def __set__(self, obj: int, value: str) -> None:
+    def __set__(self, obj: Optional["BNO055_I2C"], value: Any) -> None:
         raise NotImplementedError()
 
 
@@ -168,7 +170,7 @@ class _ModeStruct(Struct):  # pylint: disable=too-few-public-methods
         self.mode = mode
 
     def __get__(
-        self, obj: Optional["BNO055"], objtype: Optional[Type["BNO055"]] = None
+        self, obj: Optional["BNO055_I2C"], objtype: Optional[Type["BNO055_I2C"]] = None
     ) -> Union[int, Tuple[int, int, int]]:
         last_mode = obj.mode
         obj.mode = self.mode
@@ -178,7 +180,7 @@ class _ModeStruct(Struct):  # pylint: disable=too-few-public-methods
         return result[0] if isinstance(result, tuple) and len(result) == 1 else result
 
     def __set__(
-        self, obj: Optional["BNO055"], value: Union[int, Tuple[int, int, int]]
+        self, obj: Optional["BNO055_I2C"], value: Union[int, Tuple[int, int, int]]
     ) -> None:
         last_mode = obj.mode
         obj.mode = self.mode
