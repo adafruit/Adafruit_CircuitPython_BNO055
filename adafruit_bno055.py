@@ -35,6 +35,12 @@ from micropython import const
 from adafruit_bus_device.i2c_device import I2CDevice
 from adafruit_register.i2c_struct import Struct, UnaryStruct
 
+try:
+    from typing import Any, Optional, Tuple, Type, Union
+    from busio import I2C, UART
+except ImportError:
+    pass
+
 __version__ = "0.0.0+auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_BNO055.git"
 
@@ -139,29 +145,33 @@ AXIS_REMAP_NEGATIVE = const(0x01)
 
 
 class _ScaledReadOnlyStruct(Struct):  # pylint: disable=too-few-public-methods
-    def __init__(self, register_address, struct_format, scale):
+    def __init__(self, register_address: int, struct_format: str, scale: float) -> None:
         super().__init__(register_address, struct_format)
         self.scale = scale
 
-    def __get__(self, obj, objtype=None):
+    def __get__(
+        self, obj: Optional["BNO055_I2C"], objtype: Optional[Type["BNO055_I2C"]] = None
+    ) -> Tuple[float, float, float]:
         result = super().__get__(obj, objtype)
         return tuple(self.scale * v for v in result)
 
-    def __set__(self, obj, value):
+    def __set__(self, obj: Optional["BNO055_I2C"], value: Any) -> None:
         raise NotImplementedError()
 
 
 class _ReadOnlyUnaryStruct(UnaryStruct):  # pylint: disable=too-few-public-methods
-    def __set__(self, obj, value):
+    def __set__(self, obj: Optional["BNO055_I2C"], value: Any) -> None:
         raise NotImplementedError()
 
 
 class _ModeStruct(Struct):  # pylint: disable=too-few-public-methods
-    def __init__(self, register_address, struct_format, mode):
+    def __init__(self, register_address: int, struct_format: str, mode: int) -> None:
         super().__init__(register_address, struct_format)
         self.mode = mode
 
-    def __get__(self, obj, objtype=None):
+    def __get__(
+        self, obj: Optional["BNO055_I2C"], objtype: Optional[Type["BNO055_I2C"]] = None
+    ) -> Union[int, Tuple[int, int, int]]:
         last_mode = obj.mode
         obj.mode = self.mode
         result = super().__get__(obj, objtype)
@@ -169,7 +179,9 @@ class _ModeStruct(Struct):  # pylint: disable=too-few-public-methods
         # single value comes back as a one-element tuple
         return result[0] if isinstance(result, tuple) and len(result) == 1 else result
 
-    def __set__(self, obj, value):
+    def __set__(
+        self, obj: Optional["BNO055_I2C"], value: Union[int, Tuple[int, int, int]]
+    ) -> None:
         last_mode = obj.mode
         obj.mode = self.mode
         # underlying __set__() expects a tuple
@@ -208,10 +220,10 @@ class BNO055:  # pylint: disable=too-many-public-methods
 
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         chip_id = self._read_register(_ID_REGISTER)
         if chip_id != _CHIP_ID:
-            raise RuntimeError("bad chip id (%x != %x)" % (chip_id, _CHIP_ID))
+            raise RuntimeError(f"bad chip id ({chip_id:#x} != {_CHIP_ID:#x})")
         self._reset()
         self.set_normal_mode()
         self._write_register(_PAGE_REGISTER, 0x00)
@@ -223,7 +235,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
         self.mode = NDOF_MODE
         time.sleep(0.01)
 
-    def _reset(self):
+    def _reset(self) -> None:
         """Resets the sensor to default settings."""
         self.mode = CONFIG_MODE
         try:
@@ -234,7 +246,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
         time.sleep(0.7)
 
     @property
-    def mode(self):
+    def mode(self) -> int:
         """
         legend: x=on, -=off (see Table 3-3 in datasheet)
 
@@ -344,7 +356,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
         return self._read_register(_MODE_REGISTER) & 0b00001111  # Datasheet Table 4-2
 
     @mode.setter
-    def mode(self, new_mode):
+    def mode(self, new_mode: int) -> None:
         self._write_register(_MODE_REGISTER, CONFIG_MODE)  # Empirically necessary
         time.sleep(0.02)  # Datasheet table 3.6
         if new_mode != CONFIG_MODE:
@@ -352,7 +364,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
             time.sleep(0.01)  # Table 3.6
 
     @property
-    def calibration_status(self):
+    def calibration_status(self) -> Tuple[int, int, int, int]:
         """Tuple containing sys, gyro, accel, and mag calibration data."""
         calibration_data = self._read_register(_CALIBRATION_REGISTER)
         sys = (calibration_data >> 6) & 0x03
@@ -362,13 +374,13 @@ class BNO055:  # pylint: disable=too-many-public-methods
         return sys, gyro, accel, mag
 
     @property
-    def calibrated(self):
+    def calibrated(self) -> bool:
         """Boolean indicating calibration status."""
         sys, gyro, accel, mag = self.calibration_status
         return sys == gyro == accel == mag == 0x03
 
     @property
-    def external_crystal(self):
+    def external_crystal(self) -> bool:
         """Switches the use of external crystal on or off."""
         last_mode = self.mode
         self.mode = CONFIG_MODE
@@ -378,7 +390,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
         return value == 0x80
 
     @external_crystal.setter
-    def use_external_crystal(self, value):
+    def use_external_crystal(self, value: bool) -> None:
         last_mode = self.mode
         self.mode = CONFIG_MODE
         self._write_register(_PAGE_REGISTER, 0x00)
@@ -387,16 +399,16 @@ class BNO055:  # pylint: disable=too-many-public-methods
         time.sleep(0.01)
 
     @property
-    def temperature(self):
+    def temperature(self) -> int:
         """Measures the temperature of the chip in degrees Celsius."""
         return self._temperature
 
     @property
-    def _temperature(self):
+    def _temperature(self) -> None:
         raise NotImplementedError("Must be implemented.")
 
     @property
-    def acceleration(self):
+    def acceleration(self) -> Tuple[Optional[float], Optional[float], Optional[float]]:
         """Gives the raw accelerometer readings, in m/s.
         Returns an empty tuple of length 3 when this property has been disabled by the current mode.
         """
@@ -405,11 +417,11 @@ class BNO055:  # pylint: disable=too-many-public-methods
         return (None, None, None)
 
     @property
-    def _acceleration(self):
+    def _acceleration(self) -> None:
         raise NotImplementedError("Must be implemented.")
 
     @property
-    def magnetic(self):
+    def magnetic(self) -> Tuple[Optional[float], Optional[float], Optional[float]]:
         """Gives the raw magnetometer readings in microteslas.
         Returns an empty tuple of length 3 when this property has been disabled by the current mode.
         """
@@ -418,11 +430,11 @@ class BNO055:  # pylint: disable=too-many-public-methods
         return (None, None, None)
 
     @property
-    def _magnetic(self):
+    def _magnetic(self) -> None:
         raise NotImplementedError("Must be implemented.")
 
     @property
-    def gyro(self):
+    def gyro(self) -> Tuple[Optional[float], Optional[float], Optional[float]]:
         """Gives the raw gyroscope reading in radians per second.
         Returns an empty tuple of length 3 when this property has been disabled by the current mode.
         """
@@ -431,11 +443,11 @@ class BNO055:  # pylint: disable=too-many-public-methods
         return (None, None, None)
 
     @property
-    def _gyro(self):
+    def _gyro(self) -> None:
         raise NotImplementedError("Must be implemented.")
 
     @property
-    def euler(self):
+    def euler(self) -> Tuple[Optional[float], Optional[float], Optional[float]]:
         """Gives the calculated orientation angles, in degrees.
         Returns an empty tuple of length 3 when this property has been disabled by the current mode.
         """
@@ -444,11 +456,11 @@ class BNO055:  # pylint: disable=too-many-public-methods
         return (None, None, None)
 
     @property
-    def _euler(self):
+    def _euler(self) -> None:
         raise NotImplementedError("Must be implemented.")
 
     @property
-    def quaternion(self):
+    def quaternion(self) -> Tuple[Optional[float], Optional[float], Optional[float]]:
         """Gives the calculated orientation as a quaternion.
         Returns an empty tuple of length 3 when this property has been disabled by the current mode.
         """
@@ -457,11 +469,13 @@ class BNO055:  # pylint: disable=too-many-public-methods
         return (None, None, None, None)
 
     @property
-    def _quaternion(self):
+    def _quaternion(self) -> None:
         raise NotImplementedError("Must be implemented.")
 
     @property
-    def linear_acceleration(self):
+    def linear_acceleration(
+        self,
+    ) -> Tuple[Optional[float], Optional[float], Optional[float]]:
         """Returns the linear acceleration, without gravity, in m/s.
         Returns an empty tuple of length 3 when this property has been disabled by the current mode.
         """
@@ -470,11 +484,11 @@ class BNO055:  # pylint: disable=too-many-public-methods
         return (None, None, None)
 
     @property
-    def _linear_acceleration(self):
+    def _linear_acceleration(self) -> None:
         raise NotImplementedError("Must be implemented.")
 
     @property
-    def gravity(self):
+    def gravity(self) -> Tuple[Optional[float], Optional[float], Optional[float]]:
         """Returns the gravity vector, without acceleration in m/s.
         Returns an empty tuple of length 3 when this property has been disabled by the current mode.
         """
@@ -483,11 +497,11 @@ class BNO055:  # pylint: disable=too-many-public-methods
         return (None, None, None)
 
     @property
-    def _gravity(self):
+    def _gravity(self) -> None:
         raise NotImplementedError("Must be implemented.")
 
     @property
-    def accel_range(self):
+    def accel_range(self) -> int:
         """Switch the accelerometer range and return the new range. Default value: +/- 4g
         See table 3-8 in the datasheet.
         """
@@ -497,7 +511,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
         return 0b00000011 & value
 
     @accel_range.setter
-    def accel_range(self, rng=ACCEL_4G):
+    def accel_range(self, rng: int = ACCEL_4G) -> None:
         self._write_register(_PAGE_REGISTER, 0x01)
         value = self._read_register(_ACCEL_CONFIG_REGISTER)
         masked_value = 0b11111100 & value
@@ -505,7 +519,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
         self._write_register(_PAGE_REGISTER, 0x00)
 
     @property
-    def accel_bandwidth(self):
+    def accel_bandwidth(self) -> int:
         """Switch the accelerometer bandwidth and return the new bandwidth. Default value: 62.5 Hz
         See table 3-8 in the datasheet.
         """
@@ -515,7 +529,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
         return 0b00011100 & value
 
     @accel_bandwidth.setter
-    def accel_bandwidth(self, bandwidth=ACCEL_62_5HZ):
+    def accel_bandwidth(self, bandwidth: int = ACCEL_62_5HZ) -> None:
         if self.mode in [0x08, 0x09, 0x0A, 0x0B, 0x0C]:
             raise RuntimeError("Mode must not be a fusion mode")
         self._write_register(_PAGE_REGISTER, 0x01)
@@ -525,7 +539,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
         self._write_register(_PAGE_REGISTER, 0x00)
 
     @property
-    def accel_mode(self):
+    def accel_mode(self) -> int:
         """Switch the accelerometer mode and return the new mode. Default value: Normal
         See table 3-8 in the datasheet.
         """
@@ -535,7 +549,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
         return 0b11100000 & value
 
     @accel_mode.setter
-    def accel_mode(self, mode=ACCEL_NORMAL_MODE):
+    def accel_mode(self, mode: int = ACCEL_NORMAL_MODE) -> None:
         if self.mode in [0x08, 0x09, 0x0A, 0x0B, 0x0C]:
             raise RuntimeError("Mode must not be a fusion mode")
         self._write_register(_PAGE_REGISTER, 0x01)
@@ -545,7 +559,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
         self._write_register(_PAGE_REGISTER, 0x00)
 
     @property
-    def gyro_range(self):
+    def gyro_range(self) -> int:
         """Switch the gyroscope range and return the new range. Default value: 2000 dps
         See table 3-9 in the datasheet.
         """
@@ -555,7 +569,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
         return 0b00000111 & value
 
     @gyro_range.setter
-    def gyro_range(self, rng=GYRO_2000_DPS):
+    def gyro_range(self, rng: int = GYRO_2000_DPS) -> None:
         if self.mode in [0x08, 0x09, 0x0A, 0x0B, 0x0C]:
             raise RuntimeError("Mode must not be a fusion mode")
         self._write_register(_PAGE_REGISTER, 0x01)
@@ -565,7 +579,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
         self._write_register(_PAGE_REGISTER, 0x00)
 
     @property
-    def gyro_bandwidth(self):
+    def gyro_bandwidth(self) -> int:
         """Switch the gyroscope bandwidth and return the new bandwidth. Default value: 32 Hz
         See table 3-9 in the datasheet.
         """
@@ -575,7 +589,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
         return 0b00111000 & value
 
     @gyro_bandwidth.setter
-    def gyro_bandwidth(self, bandwidth=GYRO_32HZ):
+    def gyro_bandwidth(self, bandwidth: int = GYRO_32HZ) -> None:
         if self.mode in [0x08, 0x09, 0x0A, 0x0B, 0x0C]:
             raise RuntimeError("Mode must not be a fusion mode")
         self._write_register(_PAGE_REGISTER, 0x01)
@@ -585,7 +599,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
         self._write_register(_PAGE_REGISTER, 0x00)
 
     @property
-    def gyro_mode(self):
+    def gyro_mode(self) -> int:
         """Switch the gyroscope mode and return the new mode. Default value: Normal
         See table 3-9 in the datasheet.
         """
@@ -595,7 +609,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
         return 0b00000111 & value
 
     @gyro_mode.setter
-    def gyro_mode(self, mode=GYRO_NORMAL_MODE):
+    def gyro_mode(self, mode: int = GYRO_NORMAL_MODE) -> None:
         if self.mode in [0x08, 0x09, 0x0A, 0x0B, 0x0C]:
             raise RuntimeError("Mode must not be a fusion mode")
         self._write_register(_PAGE_REGISTER, 0x01)
@@ -605,7 +619,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
         self._write_register(_PAGE_REGISTER, 0x00)
 
     @property
-    def magnet_rate(self):
+    def magnet_rate(self) -> int:
         """Switch the magnetometer data output rate and return the new rate. Default value: 20Hz
         See table 3-10 in the datasheet.
         """
@@ -615,7 +629,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
         return 0b00000111 & value
 
     @magnet_rate.setter
-    def magnet_rate(self, rate=MAGNET_20HZ):
+    def magnet_rate(self, rate: int = MAGNET_20HZ) -> None:
         if self.mode in [0x08, 0x09, 0x0A, 0x0B, 0x0C]:
             raise RuntimeError("Mode must not be a fusion mode")
         self._write_register(_PAGE_REGISTER, 0x01)
@@ -625,7 +639,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
         self._write_register(_PAGE_REGISTER, 0x00)
 
     @property
-    def magnet_operation_mode(self):
+    def magnet_operation_mode(self) -> int:
         """Switch the magnetometer operation mode and return the new mode. Default value: Regular
         See table 3-10 in the datasheet.
         """
@@ -635,7 +649,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
         return 0b00011000 & value
 
     @magnet_operation_mode.setter
-    def magnet_operation_mode(self, mode=MAGNET_REGULAR_MODE):
+    def magnet_operation_mode(self, mode: int = MAGNET_REGULAR_MODE) -> None:
         if self.mode in [0x08, 0x09, 0x0A, 0x0B, 0x0C]:
             raise RuntimeError("Mode must not be a fusion mode")
         self._write_register(_PAGE_REGISTER, 0x01)
@@ -645,7 +659,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
         self._write_register(_PAGE_REGISTER, 0x00)
 
     @property
-    def magnet_mode(self):
+    def magnet_mode(self) -> int:
         """Switch the magnetometer power mode and return the new mode. Default value: Forced
         See table 3-10 in the datasheet.
         """
@@ -655,7 +669,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
         return 0b01100000 & value
 
     @magnet_mode.setter
-    def magnet_mode(self, mode=MAGNET_FORCEMODE_MODE):
+    def magnet_mode(self, mode: int = MAGNET_FORCEMODE_MODE) -> None:
         if self.mode in [0x08, 0x09, 0x0A, 0x0B, 0x0C]:
             raise RuntimeError("Mode must not be a fusion mode")
         self._write_register(_PAGE_REGISTER, 0x01)
@@ -664,10 +678,10 @@ class BNO055:  # pylint: disable=too-many-public-methods
         self._write_register(_MAGNET_CONFIG_REGISTER, masked_value | mode)
         self._write_register(_PAGE_REGISTER, 0x00)
 
-    def _write_register(self, register, value):
+    def _write_register(self, register: int, value: int) -> None:
         raise NotImplementedError("Must be implemented.")
 
-    def _read_register(self, register):
+    def _read_register(self, register: int) -> None:
         raise NotImplementedError("Must be implemented.")
 
     @property
@@ -736,11 +750,11 @@ class BNO055:  # pylint: disable=too-many-public-methods
         # Go back to normal operation mode.
         self._write_register(_MODE_REGISTER, current_mode)
 
-    def set_normal_mode(self):
+    def set_normal_mode(self) -> None:
         """Sets the sensor to Normal power mode"""
         self._write_register(_POWER_REGISTER, _POWER_NORMAL)
 
-    def set_suspend_mode(self):
+    def set_suspend_mode(self) -> None:
         """Sets the sensor to Suspend power mode"""
         self._write_register(_POWER_REGISTER, _POWER_SUSPEND)
 
@@ -771,18 +785,18 @@ class BNO055_I2C(BNO055):
     radius_magnetometer = _ModeStruct(_RADIUS_MAGNET_REGISTER, "<h", CONFIG_MODE)
     """Radius for magnetometer (cm?)"""
 
-    def __init__(self, i2c, address=0x28):
+    def __init__(self, i2c: I2C, address: int = 0x28) -> None:
         self.buffer = bytearray(2)
         self.i2c_device = I2CDevice(i2c, address)
         super().__init__()
 
-    def _write_register(self, register, value):
+    def _write_register(self, register: int, value: int) -> None:
         self.buffer[0] = register
         self.buffer[1] = value
         with self.i2c_device as i2c:
             i2c.write(self.buffer)
 
-    def _read_register(self, register):
+    def _read_register(self, register: int) -> int:
         self.buffer[0] = register
         with self.i2c_device as i2c:
             i2c.write_then_readinto(self.buffer, self.buffer, out_end=1, in_start=1)
@@ -794,14 +808,14 @@ class BNO055_UART(BNO055):
     Driver for the BNO055 9DOF IMU sensor via UART.
     """
 
-    def __init__(self, uart):
+    def __init__(self, uart: UART) -> None:
         self._uart = uart
         self._uart.baudrate = 115200
         super().__init__()
 
-    def _write_register(
-        self, register, data
-    ):  # pylint: disable=arguments-differ,arguments-renamed
+    def _write_register(  # pylint: disable=arguments-differ,arguments-renamed
+        self, register: int, data: int
+    ) -> None:
         if not isinstance(data, bytes):
             data = bytes([data])
         self._uart.write(bytes([0xAA, 0x00, register, len(data)]) + data)
@@ -812,9 +826,11 @@ class BNO055_UART(BNO055):
         if len(resp) < 2:
             raise OSError("UART access error.")
         if resp[0] != 0xEE or resp[1] != 0x01:
-            raise RuntimeError("UART write error: {}".format(resp[1]))
+            raise RuntimeError(f"UART write error: {resp[1]}")
 
-    def _read_register(self, register, length=1):  # pylint: disable=arguments-differ
+    def _read_register(  # pylint: disable=arguments-differ
+        self, register: int, length: int = 1
+    ) -> int:
         i = 0
         while i < 3:
             self._uart.write(bytes([0xAA, 0x01, register, length]))
@@ -828,101 +844,101 @@ class BNO055_UART(BNO055):
         if len(resp) < 2:
             raise OSError("UART access error.")
         if resp[0] != 0xBB:
-            raise RuntimeError("UART read error: {}".format(resp[1]))
+            raise RuntimeError(f"UART read error: {resp[1]}")
         if length > 1:
             return resp[2:]
         return int(resp[2])
 
     @property
-    def _temperature(self):
+    def _temperature(self) -> int:
         return self._read_register(0x34)
 
     @property
-    def _acceleration(self):
+    def _acceleration(self) -> Tuple[float, float, float]:
         resp = struct.unpack("<hhh", self._read_register(0x08, 6))
         return tuple(x / 100 for x in resp)
 
     @property
-    def _magnetic(self):
+    def _magnetic(self) -> Tuple[float, float, float]:
         resp = struct.unpack("<hhh", self._read_register(0x0E, 6))
         return tuple(x / 16 for x in resp)
 
     @property
-    def _gyro(self):
+    def _gyro(self) -> Tuple[float, float, float]:
         resp = struct.unpack("<hhh", self._read_register(0x14, 6))
         return tuple(x * 0.001090830782496456 for x in resp)
 
     @property
-    def _euler(self):
+    def _euler(self) -> Tuple[float, float, float]:
         resp = struct.unpack("<hhh", self._read_register(0x1A, 6))
         return tuple(x / 16 for x in resp)
 
     @property
-    def _quaternion(self):
+    def _quaternion(self) -> Tuple[float, float, float]:
         resp = struct.unpack("<hhhh", self._read_register(0x20, 8))
         return tuple(x / (1 << 14) for x in resp)
 
     @property
-    def _linear_acceleration(self):
+    def _linear_acceleration(self) -> Tuple[float, float, float]:
         resp = struct.unpack("<hhh", self._read_register(0x28, 6))
         return tuple(x / 100 for x in resp)
 
     @property
-    def _gravity(self):
+    def _gravity(self) -> Tuple[float, float, float]:
         resp = struct.unpack("<hhh", self._read_register(0x2E, 6))
         return tuple(x / 100 for x in resp)
 
     @property
-    def offsets_accelerometer(self):
+    def offsets_accelerometer(self) -> Tuple[int, int, int]:
         """Calibration offsets for the accelerometer"""
         return struct.unpack("<hhh", self._read_register(_OFFSET_ACCEL_REGISTER, 6))
 
     @offsets_accelerometer.setter
-    def offsets_accelerometer(self, offsets):
+    def offsets_accelerometer(self, offsets: Tuple[int, int, int]) -> None:
         data = bytearray(6)
         struct.pack_into("<hhh", data, 0, *offsets)
         self._write_register(_OFFSET_ACCEL_REGISTER, bytes(data))
 
     @property
-    def offsets_magnetometer(self):
+    def offsets_magnetometer(self) -> Tuple[int, int, int]:
         """Calibration offsets for the magnetometer"""
         return struct.unpack("<hhh", self._read_register(_OFFSET_MAGNET_REGISTER, 6))
 
     @offsets_magnetometer.setter
-    def offsets_magnetometer(self, offsets):
+    def offsets_magnetometer(self, offsets: Tuple[int, int, int]) -> None:
         data = bytearray(6)
         struct.pack_into("<hhh", data, 0, *offsets)
         self._write_register(_OFFSET_MAGNET_REGISTER, bytes(data))
 
     @property
-    def offsets_gyroscope(self):
+    def offsets_gyroscope(self) -> Tuple[int, int, int]:
         """Calibration offsets for the gyroscope"""
         return struct.unpack("<hhh", self._read_register(_OFFSET_GYRO_REGISTER, 6))
 
     @offsets_gyroscope.setter
-    def offsets_gyroscope(self, offsets):
+    def offsets_gyroscope(self, offsets: Tuple[int, int, int]) -> None:
         data = bytearray(6)
         struct.pack_into("<hhh", data, 0, *offsets)
         self._write_register(_OFFSET_GYRO_REGISTER, bytes(data))
 
     @property
-    def radius_accelerometer(self):
+    def radius_accelerometer(self) -> int:
         """Radius for accelerometer (cm?)"""
         return struct.unpack("<h", self._read_register(_RADIUS_ACCEL_REGISTER, 2))[0]
 
     @radius_accelerometer.setter
-    def radius_accelerometer(self, radius):
+    def radius_accelerometer(self, radius: int) -> None:
         data = bytearray(2)
         struct.pack_into("<h", data, 0, radius)
         self._write_register(_RADIUS_ACCEL_REGISTER, bytes(data))
 
     @property
-    def radius_magnetometer(self):
+    def radius_magnetometer(self) -> int:
         """Radius for magnetometer (cm?)"""
         return struct.unpack("<h", self._read_register(_RADIUS_MAGNET_REGISTER, 2))[0]
 
     @radius_magnetometer.setter
-    def radius_magnetometer(self, radius):
+    def radius_magnetometer(self, radius: int) -> None:
         data = bytearray(2)
         struct.pack_into("<h", data, 0, radius)
         self._write_register(_RADIUS_MAGNET_REGISTER, bytes(data))
