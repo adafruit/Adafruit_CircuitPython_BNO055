@@ -460,9 +460,11 @@ class BNO055:  # pylint: disable=too-many-public-methods
         raise NotImplementedError("Must be implemented.")
 
     @property
-    def quaternion(self) -> Tuple[Optional[float], Optional[float], Optional[float]]:
+    def quaternion(
+        self,
+    ) -> Tuple[Optional[float], Optional[float], Optional[float], Optional[float]]:
         """Gives the calculated orientation as a quaternion.
-        Returns an empty tuple of length 3 when this property has been disabled by the current mode.
+        Returns an empty tuple of length 4 when this property has been disabled by the current mode.
         """
         if self.mode in [0x08, 0x09, 0x0A, 0x0B, 0x0C]:
             return self._quaternion
