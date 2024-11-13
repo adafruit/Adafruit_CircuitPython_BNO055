@@ -409,7 +409,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
 
     @property
     def acceleration(self) -> Tuple[Optional[float], Optional[float], Optional[float]]:
-        """Gives the raw accelerometer readings, in m/s.
+        """Gives the raw accelerometer readings, in m/s^2.
         Returns an empty tuple of length 3 when this property has been disabled by the current mode.
         """
         if self.mode not in [0x00, 0x02, 0x03, 0x06]:
