@@ -514,11 +514,17 @@ class BNO055:  # pylint: disable=too-many-public-methods
 
     @accel_range.setter
     def accel_range(self, rng: int = ACCEL_4G) -> None:
+        old_mode = None
+        if self.mode != CONFIG_MODE:
+            old_mode = self.mode
+            self.mode = CONFIG_MODE
         self._write_register(_PAGE_REGISTER, 0x01)
         value = self._read_register(_ACCEL_CONFIG_REGISTER)
         masked_value = 0b11111100 & value
         self._write_register(_ACCEL_CONFIG_REGISTER, masked_value | rng)
         self._write_register(_PAGE_REGISTER, 0x00)
+        if old_mode is not None:
+            self.mode = old_mode
 
     @property
     def accel_bandwidth(self) -> int:
@@ -534,11 +540,17 @@ class BNO055:  # pylint: disable=too-many-public-methods
     def accel_bandwidth(self, bandwidth: int = ACCEL_62_5HZ) -> None:
         if self.mode in [0x08, 0x09, 0x0A, 0x0B, 0x0C]:
             raise RuntimeError("Mode must not be a fusion mode")
+        old_mode = None
+        if self.mode != CONFIG_MODE:
+            old_mode = self.mode
+            self.mode = CONFIG_MODE
         self._write_register(_PAGE_REGISTER, 0x01)
         value = self._read_register(_ACCEL_CONFIG_REGISTER)
         masked_value = 0b11100011 & value
         self._write_register(_ACCEL_CONFIG_REGISTER, masked_value | bandwidth)
         self._write_register(_PAGE_REGISTER, 0x00)
+        if old_mode is not None:
+            self.mode = old_mode
 
     @property
     def accel_mode(self) -> int:
@@ -574,11 +586,17 @@ class BNO055:  # pylint: disable=too-many-public-methods
     def gyro_range(self, rng: int = GYRO_2000_DPS) -> None:
         if self.mode in [0x08, 0x09, 0x0A, 0x0B, 0x0C]:
             raise RuntimeError("Mode must not be a fusion mode")
+        old_mode = None
+        if self.mode != CONFIG_MODE:
+            old_mode = self.mode
+            self.mode = CONFIG_MODE
         self._write_register(_PAGE_REGISTER, 0x01)
         value = self._read_register(_GYRO_CONFIG_0_REGISTER)
         masked_value = 0b00111000 & value
         self._write_register(_GYRO_CONFIG_0_REGISTER, masked_value | rng)
         self._write_register(_PAGE_REGISTER, 0x00)
+        if old_mode is not None:
+            self.mode = old_mode
 
     @property
     def gyro_bandwidth(self) -> int:
@@ -594,11 +612,17 @@ class BNO055:  # pylint: disable=too-many-public-methods
     def gyro_bandwidth(self, bandwidth: int = GYRO_32HZ) -> None:
         if self.mode in [0x08, 0x09, 0x0A, 0x0B, 0x0C]:
             raise RuntimeError("Mode must not be a fusion mode")
+        old_mode = None
+        if self.mode != CONFIG_MODE:
+            old_mode = self.mode
+            self.mode = CONFIG_MODE
         self._write_register(_PAGE_REGISTER, 0x01)
         value = self._read_register(_GYRO_CONFIG_0_REGISTER)
         masked_value = 0b00000111 & value
         self._write_register(_GYRO_CONFIG_0_REGISTER, masked_value | bandwidth)
         self._write_register(_PAGE_REGISTER, 0x00)
+        if old_mode is not None:
+            self.mode = old_mode
 
     @property
     def gyro_mode(self) -> int:
