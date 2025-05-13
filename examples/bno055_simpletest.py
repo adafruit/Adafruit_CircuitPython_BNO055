@@ -2,9 +2,10 @@
 # SPDX-License-Identifier: MIT
 
 import time
-import board
-import adafruit_bno055
 
+import board
+
+import adafruit_bno055
 
 i2c = board.I2C()  # uses board.SCL and board.SDA
 # i2c = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
@@ -18,7 +19,7 @@ last_val = 0xFFFF
 
 
 def temperature():
-    global last_val  # pylint: disable=global-statement
+    global last_val  # noqa: PLW0603
     result = sensor.temperature
     if abs(result - last_val) == 128:
         result = sensor.temperature
@@ -29,19 +30,19 @@ def temperature():
 
 
 while True:
-    print("Temperature: {} degrees C".format(sensor.temperature))
+    print(f"Temperature: {sensor.temperature} degrees C")
     """
     print(
         "Temperature: {} degrees C".format(temperature())
     )  # Uncomment if using a Raspberry Pi
     """
-    print("Accelerometer (m/s^2): {}".format(sensor.acceleration))
-    print("Magnetometer (microteslas): {}".format(sensor.magnetic))
-    print("Gyroscope (rad/sec): {}".format(sensor.gyro))
-    print("Euler angle: {}".format(sensor.euler))
-    print("Quaternion: {}".format(sensor.quaternion))
-    print("Linear acceleration (m/s^2): {}".format(sensor.linear_acceleration))
-    print("Gravity (m/s^2): {}".format(sensor.gravity))
+    print(f"Accelerometer (m/s^2): {sensor.acceleration}")
+    print(f"Magnetometer (microteslas): {sensor.magnetic}")
+    print(f"Gyroscope (rad/sec): {sensor.gyro}")
+    print(f"Euler angle: {sensor.euler}")
+    print(f"Quaternion: {sensor.quaternion}")
+    print(f"Linear acceleration (m/s^2): {sensor.linear_acceleration}")
+    print(f"Gravity (m/s^2): {sensor.gravity}")
     print()
 
     time.sleep(1)

@@ -21,11 +21,12 @@ Implementation Notes
 """
 
 import time
+
 import board
+
 import adafruit_bno055
 
 
-# pylint: disable=too-few-public-methods
 class Mode:
     CONFIG_MODE = 0x00
     ACCONLY_MODE = 0x01

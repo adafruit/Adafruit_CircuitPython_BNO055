@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: MIT
 import math
 import time
+
 import board
 
 import adafruit_bno055

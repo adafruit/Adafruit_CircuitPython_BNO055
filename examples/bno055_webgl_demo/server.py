@@ -119,7 +119,7 @@ def bno_sse():
             "calAccel": accel,
             "calMag": mag,
         }
-        yield "data: {0}\n\n".format(json.dumps(data))
+        yield f"data: {json.dumps(data)}\n\n"
 
 
 @app.before_first_request
@@ -129,7 +129,7 @@ def start_bno_thread():
     # this is the only spot to put code that can only run once after starting.
     # See this SO question for more context:
     #   http://stackoverflow.com/questions/24617795/starting-thread-while-running-flask-with-debug
-    global bno_thread  # pylint: disable=global-statement
+    global bno_thread  # noqa: PLW0603
     # Kick off BNO055 reading thread.
     bno_thread = threading.Thread(target=read_bno)
     bno_thread.daemon = True  # Don't let the BNO reading thread block exiting.
