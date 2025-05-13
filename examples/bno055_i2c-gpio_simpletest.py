@@ -13,7 +13,9 @@ have it enabled. You will have to manually enable it
 """
 
 import time
+
 from adafruit_extended_bus import ExtendedI2C as I2C
+
 import adafruit_bno055
 
 # To enable i2c-gpio, add the line `dtoverlay=i2c-gpio` to /boot/config.txt
@@ -28,7 +30,7 @@ last_val = 0xFFFF
 
 
 def temperature():
-    global last_val  # pylint: disable=global-statement
+    global last_val  # noqa: PLW0603
     result = sensor.temperature
     if abs(result - last_val) == 128:
         result = sensor.temperature
@@ -39,14 +41,14 @@ def temperature():
 
 
 while True:
-    print("Temperature: {} degrees C".format(temperature()))
-    print("Accelerometer (m/s^2): {}".format(sensor.acceleration))
-    print("Magnetometer (microteslas): {}".format(sensor.magnetic))
-    print("Gyroscope (rad/sec): {}".format(sensor.gyro))
-    print("Euler angle: {}".format(sensor.euler))
-    print("Quaternion: {}".format(sensor.quaternion))
-    print("Linear acceleration (m/s^2): {}".format(sensor.linear_acceleration))
-    print("Gravity (m/s^2): {}".format(sensor.gravity))
+    print(f"Temperature: {temperature()} degrees C")
+    print(f"Accelerometer (m/s^2): {sensor.acceleration}")
+    print(f"Magnetometer (microteslas): {sensor.magnetic}")
+    print(f"Gyroscope (rad/sec): {sensor.gyro}")
+    print(f"Euler angle: {sensor.euler}")
+    print(f"Quaternion: {sensor.quaternion}")
+    print(f"Linear acceleration (m/s^2): {sensor.linear_acceleration}")
+    print(f"Gravity (m/s^2): {sensor.gravity}")
     print()
 
     time.sleep(1)

@@ -28,15 +28,17 @@ inertial measurement unit module with sensor fusion.
 * Adafruit's Register library: https://github.com/adafruit/Adafruit_CircuitPython_Register
 
 """
-import time
-import struct
 
-from micropython import const
+import struct
+import time
+
 from adafruit_bus_device.i2c_device import I2CDevice
 from adafruit_register.i2c_struct import Struct, UnaryStruct
+from micropython import const
 
 try:
     from typing import Any, Optional, Tuple, Type, Union
+
     from busio import I2C, UART
 except ImportError:
     pass
@@ -144,7 +146,7 @@ AXIS_REMAP_POSITIVE = const(0x00)
 AXIS_REMAP_NEGATIVE = const(0x01)
 
 
-class _ScaledReadOnlyStruct(Struct):  # pylint: disable=too-few-public-methods
+class _ScaledReadOnlyStruct(Struct):
     def __init__(self, register_address: int, struct_format: str, scale: float) -> None:
         super().__init__(register_address, struct_format)
         self.scale = scale
@@ -159,12 +161,12 @@ class _ScaledReadOnlyStruct(Struct):  # pylint: disable=too-few-public-methods
         raise NotImplementedError()
 
 
-class _ReadOnlyUnaryStruct(UnaryStruct):  # pylint: disable=too-few-public-methods
+class _ReadOnlyUnaryStruct(UnaryStruct):
     def __set__(self, obj: Optional["BNO055_I2C"], value: Any) -> None:
         raise NotImplementedError()
 
 
-class _ModeStruct(Struct):  # pylint: disable=too-few-public-methods
+class _ModeStruct(Struct):
     def __init__(self, register_address: int, struct_format: str, mode: int) -> None:
         super().__init__(register_address, struct_format)
         self.mode = mode
@@ -179,9 +181,7 @@ class _ModeStruct(Struct):  # pylint: disable=too-few-public-methods
         # single value comes back as a one-element tuple
         return result[0] if isinstance(result, tuple) and len(result) == 1 else result
 
-    def __set__(
-        self, obj: Optional["BNO055_I2C"], value: Union[int, Tuple[int, int, int]]
-    ) -> None:
+    def __set__(self, obj: Optional["BNO055_I2C"], value: Union[int, Tuple[int, int, int]]) -> None:
         last_mode = obj.mode
         obj.mode = self.mode
         # underlying __set__() expects a tuple
@@ -190,7 +190,7 @@ class _ModeStruct(Struct):  # pylint: disable=too-few-public-methods
         obj.mode = last_mode
 
 
-class BNO055:  # pylint: disable=too-many-public-methods
+class BNO055:
     """
     Base class for the BNO055 9DOF IMU sensor.
 
@@ -412,7 +412,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
         """Gives the raw accelerometer readings, in m/s^2.
         Returns an empty tuple of length 3 when this property has been disabled by the current mode.
         """
-        if self.mode not in [0x00, 0x02, 0x03, 0x06]:
+        if self.mode not in {0x00, 0x02, 0x03, 0x06}:
             return self._acceleration
         return (None, None, None)
 
@@ -425,7 +425,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
         """Gives the raw magnetometer readings in microteslas.
         Returns an empty tuple of length 3 when this property has been disabled by the current mode.
         """
-        if self.mode not in [0x00, 0x01, 0x03, 0x05, 0x08]:
+        if self.mode not in {0x00, 0x01, 0x03, 0x05, 0x08}:
             return self._magnetic
         return (None, None, None)
 
@@ -438,7 +438,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
         """Gives the raw gyroscope reading in radians per second.
         Returns an empty tuple of length 3 when this property has been disabled by the current mode.
         """
-        if self.mode not in [0x00, 0x01, 0x02, 0x04, 0x09, 0x0A]:
+        if self.mode not in {0x00, 0x01, 0x02, 0x04, 0x09, 0x0A}:
             return self._gyro
         return (None, None, None)
 
@@ -451,7 +451,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
         """Gives the calculated orientation angles, in degrees.
         Returns an empty tuple of length 3 when this property has been disabled by the current mode.
         """
-        if self.mode in [0x08, 0x09, 0x0A, 0x0B, 0x0C]:
+        if self.mode in {0x08, 0x09, 0x0A, 0x0B, 0x0C}:
             return self._euler
         return (None, None, None)
 
@@ -466,7 +466,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
         """Gives the calculated orientation as a quaternion.
         Returns an empty tuple of length 4 when this property has been disabled by the current mode.
         """
-        if self.mode in [0x08, 0x09, 0x0A, 0x0B, 0x0C]:
+        if self.mode in {0x08, 0x09, 0x0A, 0x0B, 0x0C}:
             return self._quaternion
         return (None, None, None, None)
 
@@ -481,7 +481,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
         """Returns the linear acceleration, without gravity, in m/s.
         Returns an empty tuple of length 3 when this property has been disabled by the current mode.
         """
-        if self.mode in [0x08, 0x09, 0x0A, 0x0B, 0x0C]:
+        if self.mode in {0x08, 0x09, 0x0A, 0x0B, 0x0C}:
             return self._linear_acceleration
         return (None, None, None)
 
@@ -494,7 +494,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
         """Returns the gravity vector, without acceleration in m/s.
         Returns an empty tuple of length 3 when this property has been disabled by the current mode.
         """
-        if self.mode in [0x08, 0x09, 0x0A, 0x0B, 0x0C]:
+        if self.mode in {0x08, 0x09, 0x0A, 0x0B, 0x0C}:
             return self._gravity
         return (None, None, None)
 
@@ -538,7 +538,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
 
     @accel_bandwidth.setter
     def accel_bandwidth(self, bandwidth: int = ACCEL_62_5HZ) -> None:
-        if self.mode in [0x08, 0x09, 0x0A, 0x0B, 0x0C]:
+        if self.mode in {0x08, 0x09, 0x0A, 0x0B, 0x0C}:
             raise RuntimeError("Mode must not be a fusion mode")
         old_mode = None
         if self.mode != CONFIG_MODE:
@@ -564,7 +564,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
 
     @accel_mode.setter
     def accel_mode(self, mode: int = ACCEL_NORMAL_MODE) -> None:
-        if self.mode in [0x08, 0x09, 0x0A, 0x0B, 0x0C]:
+        if self.mode in {0x08, 0x09, 0x0A, 0x0B, 0x0C}:
             raise RuntimeError("Mode must not be a fusion mode")
         self._write_register(_PAGE_REGISTER, 0x01)
         value = self._read_register(_ACCEL_CONFIG_REGISTER)
@@ -584,7 +584,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
 
     @gyro_range.setter
     def gyro_range(self, rng: int = GYRO_2000_DPS) -> None:
-        if self.mode in [0x08, 0x09, 0x0A, 0x0B, 0x0C]:
+        if self.mode in {0x08, 0x09, 0x0A, 0x0B, 0x0C}:
             raise RuntimeError("Mode must not be a fusion mode")
         old_mode = None
         if self.mode != CONFIG_MODE:
@@ -610,7 +610,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
 
     @gyro_bandwidth.setter
     def gyro_bandwidth(self, bandwidth: int = GYRO_32HZ) -> None:
-        if self.mode in [0x08, 0x09, 0x0A, 0x0B, 0x0C]:
+        if self.mode in {0x08, 0x09, 0x0A, 0x0B, 0x0C}:
             raise RuntimeError("Mode must not be a fusion mode")
         old_mode = None
         if self.mode != CONFIG_MODE:
@@ -636,7 +636,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
 
     @gyro_mode.setter
     def gyro_mode(self, mode: int = GYRO_NORMAL_MODE) -> None:
-        if self.mode in [0x08, 0x09, 0x0A, 0x0B, 0x0C]:
+        if self.mode in {0x08, 0x09, 0x0A, 0x0B, 0x0C}:
             raise RuntimeError("Mode must not be a fusion mode")
         self._write_register(_PAGE_REGISTER, 0x01)
         value = self._read_register(_GYRO_CONFIG_1_REGISTER)
@@ -656,7 +656,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
 
     @magnet_rate.setter
     def magnet_rate(self, rate: int = MAGNET_20HZ) -> None:
-        if self.mode in [0x08, 0x09, 0x0A, 0x0B, 0x0C]:
+        if self.mode in {0x08, 0x09, 0x0A, 0x0B, 0x0C}:
             raise RuntimeError("Mode must not be a fusion mode")
         self._write_register(_PAGE_REGISTER, 0x01)
         value = self._read_register(_MAGNET_CONFIG_REGISTER)
@@ -676,7 +676,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
 
     @magnet_operation_mode.setter
     def magnet_operation_mode(self, mode: int = MAGNET_REGULAR_MODE) -> None:
-        if self.mode in [0x08, 0x09, 0x0A, 0x0B, 0x0C]:
+        if self.mode in {0x08, 0x09, 0x0A, 0x0B, 0x0C}:
             raise RuntimeError("Mode must not be a fusion mode")
         self._write_register(_PAGE_REGISTER, 0x01)
         value = self._read_register(_MAGNET_CONFIG_REGISTER)
@@ -696,7 +696,7 @@ class BNO055:  # pylint: disable=too-many-public-methods
 
     @magnet_mode.setter
     def magnet_mode(self, mode: int = MAGNET_FORCEMODE_MODE) -> None:
-        if self.mode in [0x08, 0x09, 0x0A, 0x0B, 0x0C]:
+        if self.mode in {0x08, 0x09, 0x0A, 0x0B, 0x0C}:
             raise RuntimeError("Mode must not be a fusion mode")
         self._write_register(_PAGE_REGISTER, 0x01)
         value = self._read_register(_MAGNET_CONFIG_REGISTER)
@@ -839,9 +839,7 @@ class BNO055_UART(BNO055):
         self._uart.baudrate = 115200
         super().__init__()
 
-    def _write_register(  # pylint: disable=arguments-differ,arguments-renamed
-        self, register: int, data: int
-    ) -> None:
+    def _write_register(self, register: int, data: int) -> None:
         if not isinstance(data, bytes):
             data = bytes([data])
         self._uart.write(bytes([0xAA, 0x00, register, len(data)]) + data)
@@ -854,9 +852,7 @@ class BNO055_UART(BNO055):
         if resp[0] != 0xEE or resp[1] != 0x01:
             raise RuntimeError(f"UART write error: {resp[1]}")
 
-    def _read_register(  # pylint: disable=arguments-differ
-        self, register: int, length: int = 1
-    ) -> int:
+    def _read_register(self, register: int, length: int = 1) -> int:
         i = 0
         while i < 3:
             self._uart.write(bytes([0xAA, 0x01, register, length]))
